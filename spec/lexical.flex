@@ -20,66 +20,74 @@ import java_cup.runtime.*;
 
   public static String curLine;
 
-  /**
-   * Factory method for creating Symbols for a given type.
-   * @param type The type of this symbol
-   * @return A symbol of a specific type
-   */
   public Symbol symbol(int type) {
       curLine = "line :" + yyline;
       return new Symbol(type, yyline, yycolumn);
   }
   
-  /**
-   * Factory method for creating Symbols for a given type and its value.
-   * @param type The type of this symbol
-   * @param value The value of this symbol
-   * @return A symbol of a specific type
-   */
   public Symbol symbol(int type, Object value) {
       curLine = "line :" + yyline;
       return new Symbol(type, yyline, yycolumn, value);
   }
   
-  /**
-   * Reports an error occured in a given line.
-   * @param line The bad line
-   * @param msg Additional information about the error
-   */
+  /* Mensagem de erro lexico em uma dada linha */
   private void reportError(int line, String msg) {
       throw new RuntimeException("Lexical error at line #" + line + ": " + msg);
   }
 %}
 
-/* identifiers */
+
+/* Id */
 Identifier = {Letter_}({Letter}|{Alphanumerics_})*
 
+Letter = [a-zA-Z]
+Letter_ = {Letter}| _ | $
+Alphanumerics_ = [ a-zA-Z0-9_]
+
 LineTerminator = \r|\n|\r\n
+InputCharacter = [^\r\n]
+
+/* espaço */
 WhiteSpace = {LineTerminator} | [ \t\f]
 
-/* numeric */
-IntegerLiteral = 0 | [1-9][0-9]*
+/* Literais */
+IntegerLiteral = {DecimalIntegerLiteral} | {HexIntegerLiteral} | {OctalIntegerLiteral}
+DecimalIntegerLiteral = 0 | [1-9][0-9]*
+HexIntegerLiteral = 0 [xX] {HexDigit}+
+HexDigit = [0-9a-fA-F]
+OctalIntegerLiteral = 0 {OctalDigit}+
+OctalDigit = [0-7]
 
-/* floats */
-FloatLiteral = {IntegerLiteral}"."{IntegerLiteral}
+
+FloatLiteral  = ({FLit1}|{FLit2}|{FLit3}) {Exponent}? [fF]
+DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+
+FLit1    = [0-9]+ \. [0-9]* 
+FLit2    = \. [0-9]+ 
+FLit3    = [0-9]+ 
+Exponent = [eE] [+-]? [0-9]+
 
 Marker = \" | \'
 Other_Symbols = \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)
 Separators = \r|\n|\r\n\t\f
-Letter = [a-zA-Z]
-Letter_ = {Letter}|_
-Alphanumerics_ = [ a-zA-Z0-9_]
 
-StringLiteral = {Marker}   {StringContent}   {Marker}
+StringLiteral = {Marker}  {StringContent}  {Marker}
 StringContent =  {Alphanumerics_}*StringContent | {Other_Symbols}*StringContent | {Separators}*StringContent
 
-Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
+Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment}
+
+TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
+DocumentationComment = "/*" "*"+ [^/*] ~"*/"
+
 
 %%
 <YYINITIAL> {
 
-  /* keywords */
+  /*Palavras reservadas */
+
   "abstract"                     { return symbol(sym.ABSTRACT); }
+  "assert"                       { return symbol(sym.ASSERT); }
   "boolean"                      { return symbol(sym.BOOLEAN); }
   "break"                        { return symbol(sym.BREAK); }
   "byte"                         { return symbol(sym.BYTE); }
@@ -87,18 +95,21 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "catch"                        { return symbol(sym.CATCH); }
   "char"                         { return symbol(sym.CHAR); }
   "class"                        { return symbol(sym.CLASS); }
+  "const"                        { return symbol(sym.CONST); }
   "continue"                     { return symbol(sym.CONTINUE); }
   "default"                      { return symbol(sym.DEFAULT); }
   "do"                           { return symbol(sym.DO); }
   "double"                       { return symbol(sym.DOUBLE); }
   "else"                         { return symbol(sym.ELSE); }
+  "enum"                         { return symbol(sym.ENUM); }
   "extends"                      { return symbol(sym.EXTENDS); }
-  "false"						 { return symbol(sym.FALSE);}
+  "false"						             { return symbol(sym.FALSE); }
   "final"                        { return symbol(sym.FINAL); }
   "finally"                      { return symbol(sym.FINALLY); }
   "float"                        { return symbol(sym.FLOAT); }
   "for"                          { return symbol(sym.FOR); }
   "if"                           { return symbol(sym.IF); }
+  "goto"                         { return symbol(sym.GOTO); }
   "implements"                   { return symbol(sym.IMPLEMENTS); }
   "import"                       { return symbol(sym.IMPORT); }
   "instanceof"                   { return symbol(sym.INSTANCEOF); }
@@ -119,30 +130,28 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "switch"                       { return symbol(sym.SWITCH); }
   "synchronized"                 { return symbol(sym.SYNCHRONIZED); }
   "this"                         { return symbol(sym.THIS); }
-  "threadsafe"					 { return symbol(sym.THREADSAFE);}
+  "threadsafe"					         { return symbol(sym.THREADSAFE); }
   "throw"                        { return symbol(sym.THROW); }
+  "throws"                       { return symbol(sym.THROWS); }
   "transient"                    { return symbol(sym.TRANSIENT); }
-  "true"						 { return symbol(sym.TRUE);}
+  "true"						             { return symbol(sym.TRUE); }
   "try"                          { return symbol(sym.TRY); }
   "void"                         { return symbol(sym.VOID); }
+  "volatile"                     { return symbol(sym.VOLATILE); }
   "while"                        { return symbol(sym.WHILE); }
 
-/* Identifier*/
-  {Identifier} 					 { return symbol(sym.IDENTIFIER,yytext());}
 
-/* Float literals */
-  {FloatLiteral} 				 { return symbol(sym.FLOATING_POINT_LITERAL, new String(yytext()));}
+  {Identifier} 					         { return symbol(sym.IDENTIFIER, yytext()); }
 
-/* Integer literals */
-  {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext()));}
+  {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext())); }
+  {FloatLiteral} 				         { return symbol(sym.FLOAT_LITERAL, new String(yytext())); }
+  {DoubleLiteral}                { return symbol(sym.DOUBLE_LITERAL, new String(yytext())); }
+  {StringLiteral}                { return symbol(sym.STRING_LITERAL, new String(yytext())); }
 
-/* character literal */
+
   \'                             { return symbol(sym.CHARLITERAL); }
-
-/* Comments*/
-  {Comment}                      { /* just ignore it */ }
-
-/* separators */
+  {Comment}                      { /* ignore */ }
+  {WhiteSpace}                   { /* ignore */}
   "("                            { return symbol(sym.LPAREN); }
   ")"                            { return symbol(sym.RPAREN); }
   "{"                            { return symbol(sym.LBRACE); }
@@ -152,31 +161,36 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   ";"                            { return symbol(sym.SEMICOLON); }
   ":"                            { return symbol(sym.COLON); }
   ","                            { return symbol(sym.COMMA); }
-  "."   		  				 { return symbol(sym.DOT); }
+  "."   		  				           { return symbol(sym.DOT); }
   "?"                            { return symbol(sym.QUESTION); }
 
- /* TODO string literal */
-  {StringLiteral}                { return symbol(sym.STRING_LITERAL,new String(yytext())); }
 
- /* White spaces */
-  {WhiteSpace}					 { /* just ignore it*/}
+/* Arithmetical op */
+  "+" 							             { return symbol(sym.PLUS); }
+  "-" 							             { return symbol(sym.MINUS); }
+  "*" 		 					             { return symbol(sym.MULT); }
+  "/"			            			     { return symbol(sym.DIV); }
+  "%"						                 { return symbol(sym.MOD); }
 
+ /* Logical op */
+ "=="							               { return symbol(sym.EQEQ); }
+ ">="							               { return symbol(sym.GTEQ); }
+ "<="               						 { return symbol(sym.LTEQ); }
+ "<"							               { return symbol(sym.LT); }
+ ">"					               		 { return symbol(sym.GT); }
+ "||"				               			 { return symbol(sym.OROR); }
+ "&&"					               		 { return symbol(sym.ANDAND); }
+ "&"					               		 { return symbol(sym.AND); }
+ "!"					               		 { return symbol(sym.NOT); }
+ "!="					               	   { return symbol(sym.NOTEQ); }
+ "|"					               	   { return symbol(sym.OR); }
+ "^"					              	   { return symbol(sym.XOR); }
+ ">>>"				             			 { return symbol(sym.URSHIFT); }
+ "<<"					              		 { return symbol(sym.LSHIFT); }
+ ">>"					              		 { return symbol(sym.RSHIFT); }
+ ">>>="                          { return symbol(sym.URSHIFTEQ); }
 
-/* arithmetical operators*/
-  "+" 							 {return symbol(sym.PLUS);}
-  "-" 							 {return symbol(sym.MINUS);}
-  "*" 							 {return symbol(sym.MULT);}
-  "/"						     {return symbol(sym.DIV);}
-  "%"						     {return symbol(sym.MOD);}
-
-
-
-/*unary operators*/
-  "++"							 {return symbol(sym.AUTOINCRM);}
-  "--"							 {return symbol(sym.AUTODECRM);}
-
-
-/* assignment operators*/
+/* Others */
  "="                             { return symbol(sym.ASSIGNMENT, new String(yytext())); }
  "-="                            { return symbol(sym.MINUSASSIGN, new String(yytext())); }
  "+="                            { return symbol(sym.PLUSASSIGN, new String(yytext())); }
@@ -188,37 +202,10 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
  "|="                            { return symbol(sym.ORASSIGN); }
  ">>="                           { return symbol(sym.RSHIFTASSIGN, new String(yytext())); }
  "<<="                           { return symbol(sym.LSHIFTASSIGN, new String(yytext())); }
-
-
- /* Logical Operators*/
- "=="							 {return symbol(sym.EQEQ);}
- ">="							 {return symbol(sym.GTEQ);}
- "<="							 {return symbol(sym.LTEQ);}
- "<"							 {return symbol(sym.LT);}
- ">"							 {return symbol(sym.GT);}
- "||"							 {return symbol(sym.OROR);}
- "&&"							 {return symbol(sym.ANDAND);}
- "&"							 {return symbol(sym.AND);}
- "!"							 {return symbol(sym.NOT);}
- "!="							 {return symbol(sym.NOTEQ);}
- "|"							 {return symbol(sym.OR);}
- "^"						     {return symbol(sym.XOR);}
- ">>>"							 {return symbol(sym.URSHIFT);}
- "<<"							 {return symbol(sym.LSHIFT);}
- ">>"							 {return symbol(sym.RSHIFT);}
-
-
-
- /* check how to consider those later
-  "x"							 { return symbol(sym.X);}
-  "d"							 { return symbol(sym.D);}
-  "e"							 { return symbol(sym.E);}
-  "f"							 { return symbol(sym.F);}
-  "l"							 { return symbol(sym.L);}
-  */
-
+ "++"                            { return symbol(sym.AUTOINCRM); }
+ "--"                            { return symbol(sym.AUTODECRM); }
 
  }
 
-/* Input not matched */
-[^] { reportError(yyline+1, "Illegal character \"" + yytext() + "\""); }
+/* Se não entrou em nenhum outro */
+[^]                              { reportError(yyline+1, "Illegal character \"" + yytext() + "\""); }
