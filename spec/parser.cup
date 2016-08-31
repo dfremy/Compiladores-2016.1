@@ -45,12 +45,13 @@ terminal THREADSAFE; // threadsafe terminal
 terminal FLOAT, DOUBLE; // floating_point_type
 terminal LBRACK, RBRACK; // array_type
 terminal DOT; // qualified_name
-terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
+terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, LPAREN, RPAREN, COLON;
 terminal PACKAGE; // package_declaration
 terminal IMPORT; // import_declaration
 terminal PUBLIC, PROTECTED, PRIVATE; // modifier
 terminal STATIC; // modifier
 terminal ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
+terminal ASSERT, CONST, ENUM, GOTO;
 terminal CLASS; // class_declaration
 terminal EXTENDS; // super
 terminal IMPLEMENTS; // interfaces
@@ -96,174 +97,503 @@ terminal java.lang.String IDENTIFIER; // name
 terminal NULL_LITERAL;
 
 // NON TERMINALS
-//DONE
-non terminal compilation_unit;
-non terminal package_statement;
-non terminal import_statement;
-non terminal package_name;
-non terminal class_name;
-non terminal interface_name;
-non terminal doc_comment;
-non terminal class_declaration;
-non terminal interface_declaration;
-non terminal type_declaration;
-non terminal identifier;
-non terminal modifier;
-non terminal field_declaration;
-non terminal method_declaration;
-non terminal constructor_declaration;
-non terminal variable_declaration;
-non terminal static_initializer;
-non terminal type;
-non terminal parameter_list;
-non terminal statement_block;
-non terminal variable_declarator;
-non terminal type_specifier;
-non terminal parameter;
-non terminal statement;
 
-// TODO
-non terminal variable_initializer;
+non terminal arglist;
+non terminal comma_expression;
 non terminal expression;
+non terminal expression_div;
+non terminal arglist_opt;
+non terminal numeric_expression;
+non terminal numeric_expression_diva;
+non terminal numeric_expression_divb;
+non terminal numeric_expression_divc;
+non terminal arithmetical_op;
+non terminal arithmetical_op_equal;
+non terminal arithmetical_op_equal_opt;
+non terminal testing_expression;
+non terminal comparator;
+non terminal logical_expression;
+non terminal logical_op;
+non terminal logical_op_equal;
+non terminal logical_op_equal_opt;
+non terminal string_expression;
+non terminal bit_expression;
+non terminal bit_expression_op;
+non terminal casting_expression;
+non terminal type;
+non terminal type_specifier;
+non terminal bracks_loop;
+non terminal name;
+non terminal creating_expression;
+non terminal bracks_expression_opt;
+non terminal literal_expression;
+non terminal class_declaration;
+non terminal modifier_loop;
+non terminal modifier;
+non terminal extends_class_opt;
+non terminal implements_interfaces_opt;
+non terminal name_loop;
+non terminal field_declaration_loop;
+non terminal declaration;
+non terminal method_declaration;
+non terminal param_list_opt;
+non terminal parameter;
+non terminal parameter_loop;
+non terminal end_method_declaration;
+non terminal statement_block;
+non terminal statement_loop;
+non terminal statement;
+non terminal variable_declaration;
+non terminal variable_declarator;
+non terminal variable_declarator_loop;
+non terminal variable_initializer;
+non terminal variable_initializer_loop;
+non terminal variable_initializer_opt;
+non terminal comma_opt;
 non terminal if_statement;
+non terminal else_opt;
 non terminal do_statement;
 non terminal while_statement;
 non terminal for_statement;
+non terminal for_init;
 non terminal try_statement;
+non terminal catch_loop;
+non terminal finally_opt;
 non terminal switch_statement;
+non terminal switch_statement_end;
+non terminal switch_statement_end_loop;
+non terminal constructor_declaration;
+non terminal static_initializer;
+non terminal compilation_unit;
+non terminal package_statement;
+non terminal package_statement_opt;
+non terminal import_statement;
+non terminal import_statement_loop;
+non terminal type_declaration;
+non terminal type_declaration_loop;
+non terminal interface_declaration;
 
 
-//RULES
+// RULES
 
-compilation_unit  ::= 
-  package_statement  
-  import_statement  
-  type_declaration 
+arglist ::=
+	expression comma_expression
 ;
 
-package_statement  ::= 
-  PACKAGE package_name SEMICOLON 
+comma_expression ::=
+	COMMA expression comma_expression
+	|
 ;
 
-import_statement  ::= 
- IMPORT package_name  DOT  MULT  SEMICOLON   
- |   class_name  | interface_name SEMICOLON 
+expression ::=
+	numeric_expression 
+	| testing_expression 
+	| logical_expression 
+	| string_expression 
+	| bit_expression 
+	| casting_expression 
+	| creating_expression 
+	| literal_expression 
+	| NULL
+	| SUPER 
+	| THIS
+	| identifier 
+	| LPAREN expression RPAREN
+	| expression expression_div
 ;
 
-type_declaration  ::= 
-  doc_comment  class_declaration  | interface_declaration SEMICOLON 
+expression_div ::=
+	LPAREN arglist_opt RPAREN 
+	| LBRACK expression RBRACK 
+	| DOT expression
+	| COMMA expression
+	| INSTANCEOF name
 ;
 
-//TODO
-doc_comment  ::=  "/**" "*/" 
+arglist_opt ::=
+	arglist
+	|
 ;
 
-class_declaration  ::= 
- modifier CLASS identifier 
- EXTENDS class_name  
- IMPLEMENTS interface_name  COMMA interface_name
- LBRACE   field_declaration   RBRACE
- ; 
- 
- package_name ::= 
-	identifier 
-	|  package_name DOT identifier  
-;
- 
-interface_name ::= 
-      identifier 
-      |  package_name DOT identifier
+numeric_expression ::=
+	numeric_expression_diva
+	| numeric_expression_divb
+	| numeric_expression_divc
 ;
 
-interface_declaration ::= 
-       modifier  INTERFACE identifier 
-       EXTENDS interface_name  COMMA interface_name 
-       LBRACE  field_declaration  RBRACE
-;  
-
-modifier ::= 
-      PUBLIC 
-      | PRIVATE 
-      | PROTECTED 
-      | STATIC 
-      | FINAL 
-      | NATIVE 
-      | SYNCHRONIZED 
-      | ABSTRACT 
-      | THREADSAFE 
-      | TRANSIENT 
+numeric_expression_diva ::=
+	MINUS expression
+	| AUTODECRM expression
+	| AUTOINCRM expression
 ;
 
-field_declaration ::= 
-       doc_comment   method_declaration 
-      | constructor_declaration 
-      | variable_declaration  
-      | static_initializer 
-      | SEMICOLON 
+numeric_expression_divb ::=
+	expression AUTODECRM
+	| expression AUTOINCRM
 ;
 
-method_declaration ::= 
-      modifier  type identifier 
-      LPAREN  parameter_list  RPAREN  LBRACK RBRACK  
-      statement_block | SEMICOLON  
+numeric_expression_divc ::=
+	expression arithmetical_op_equal_opt expression
 ;
 
-constructor_declaration ::= 
-      modifier identifier LPAREN  parameter_list  RPAREN 
-      statement_block 
+arithmetical_op ::=
+	PLUS
+	| MINUS
+	| MULT
+	| DIV
+	| MOD
 ;
 
-variable_declaration ::= 
-       modifier type variable_declarator 
-       COMMA variable_declarator SEMICOLON 
+arithmetical_op_equal ::=
+	PLUSASSIGN
+	| MINUSASSIGN
+	| MULTASSIGN
+	| DIVASSIGN
+	| MODASSIGN
 ;
 
-static_initializer ::= STATIC statement_block
+arithmetical_op_equal_opt ::=
+	arithmetical_op_equal
+	| arithmetical_op
+;
+	
+testing_expression ::=
+	expression comparator expression
 ;
 
-type ::= type_specifier LBRACK RBRACK
+comparator ::=
+	GT
+	| LT
+	| GTEQ
+	| LTEQ
+	| EQEQ
+	| NOTEQ
 ;
 
-parameter_list ::=  parameter COMMA parameter 
+logical_expression ::=
+	NOT expression
+	| expression logical_op_equal_opt expression
+	| expression QUESTION expression COLON expression
+	| TRUE
+	| FALSE
 ;
 
-statement_block ::= LBRACE statement RBRACE
-;
- 
- variable_declarator ::= identifier LBRACK RBRACK EQ variable_initializer
-;
-
-type_specifier ::= 
- 		BOOLEAN 
-      | BYTE
-      | CHAR 
-      | SHORT 
-      | INT 
-      | FLOAT 
-      | LONG 
-      | DOUBLE 
-      | class_name 
-      | interface_name 
+logical_op ::=
+	AND
+	| OR
+	| XOR
+	| ANDAND
+	| MOD
 ;
 
-parameter ::= type identifier LBRACK RBRACK
-; 
+logical_op_equal ::=
+	ANDASSIGN
+	| ORASSIGN
+	| XORASSIGN
+	| ORORASSIGN
+	| MODASSIGN
+;
 
-statement ::= 
-         variable_declaration 
-      |  expression SEMICOLON
-      |  statement_block 
-      |  if_statement  
-      |  do_statement
-      |  while_statement 
-      |  for_statement  
-      |  try_statement 
-      |  switch_statement  
-      |  SYNCHRONIZED LPAREN expression RPAREN statement  
-      |  RETURN  expression  SEMICOLON  
-      |  THROW expression SEMICOLON  
-      |  identifier COLON statement  
-      |  BREAK  identifier  SEMICOLON  
-      |  CONTINUE identifier SEMICOLON  
-      |  SEMICOLON 
+logical_op_equal_opt ::=
+	logical_op_equal
+	| logical_op
+;
+
+string_expression ::=
+	expression PLUS expression
+	| expression PLUSASSIGN expression
+;
+
+bit_expression ::=
+	COMP expression
+	| expression bit_expression_op expression
+;
+
+bit_expression_op ::=
+	RSHIFTASSIGN
+	| LSHIFT
+	| RSHIFT
+	| URSHIFT
+;
+	
+casting_expression ::=
+	LPAREN type RPAREN expression
+;
+
+type ::=
+	type_specifier bracks_loop
+;
+
+type_specifier ::=
+	BOOLEAN
+	| BYTE
+	| CHAR
+	| SHORT
+	| INT
+	| FLOAT
+	| LONG
+	| DOUBLE
+	| name
+;
+
+name ::=
+	IDENTIFIER
+	| name DOT IDENTIFIER
+;
+
+bracks_loop ::=
+	LBRACK RBRACK bracks_loop;
+	|
+;
+
+creating_expression ::=
+	NEW name LPAREN arglist_opt RPAREN
+	| NEW type_specifier bracks_expression_opt bracks_loop
+	| NEW LPAREN expression RPAREN
+;
+
+bracks_expression_opt ::=
+	LBRACK expression RBRACK
+	|
+;
+
+literal_expression ::=
+	INTEGER_LITERAL
+	| FLOAT_LITERAL
+	| STRING_LITERAL
+	| CHARLITERAL
+;
+
+class_declaration ::=
+	modifier_loop CLASS IDENTIFIER extends_class_opt implements_interfaces_opt LBRACE field_declaration_loop RBRACE
+;
+
+modifier_loop ::=
+	modifier modifier_loop
+	|
+;
+
+modifier ::=
+	PUBLIC
+	| PRIVATE
+	| PROTECTED
+	| STATIC
+	| FINAL
+	| NATIVE
+	| SYNCHRONIZED
+	| ABSTRACT
+	| THREADSAFE
+	| TRANSIENT
+;
+
+extends_class_opt ::=
+	EXTENDS name
+	|
+;
+
+implements_interfaces_opt ::=
+	IMPLEMENTS name name_loop
+;
+
+name_loop ::=
+	COMMA name name_loop
+	|
+}
+
+field_declaration_loop ::=
+	declaration
+	| static_initializer
+	| SEMICOLON
+;
+
+declaration ::=
+	method_declaration
+	| constructor_declaration
+	| variable_declaration
+;
+
+method_declaration ::=
+	modifier_loop type IDENTIFIER LPAREN param_list_opt RPAREN bracks_loop end_method_declaration
+;
+
+param_list_opt ::=
+	parameter parameter_loop
+	|
+;
+
+parameter ::=
+	type IDENTIFIER bracks_loop
+;
+
+parameter_loop ::=
+	COMMA parameter parameter_loop
+;
+
+end_method_declaration ::=
+	statement_block
+	| SEMICOLON
+;
+
+statement_block ::=
+	LBRACE statement_loop RBRACE
+;
+
+statement_loop ::=
+	statement statement_loop
+	|
+;
+
+statement ::=
+	variable_declaration 
+	| expression SEMICOLON
+	| statement_block
+	| if_statement
+	| do_statement
+	| while_statement
+	| for_statement
+	| try_statement
+	| switch_statement
+	| SYNCHRONIZED LPAREN expression RPAREN statement
+	| RETURN expression_opt SEMICOLON
+	| THROW expression SEMICOLON
+	| identifier COLON statement
+	| BREAK identifier_opt SEMICOLON
+	| CONTINUE identifier_opt SEMICOLON
+	| SEMICOLON
+;
+
+variable_declaration ::=
+	modifier_loop type variable_declarator variable_declarator_loop SEMICOLON
+;
+
+variable_declarator ::=
+	IDENTIFIER bracks_loop variable_initializer_opt
+;
+
+variable_declarator_loop ::=
+	COMMA variable_declarator variable_declarator_loop
+	|
+;
+
+variable_initializer_opt :==
+	ASSIGNMENT variable_initializer
+	|
+;
+
+variable_initializer ::=
+	expression
+	| LBRACE RBRACE
+	| LBRACE variable_initializer variable_initializer_loop comma_opt RBRACE
+;
+
+variable_initializer_loop ::=
+	COMMA variable_initializer variable_initializer_loop
+	|
+;
+
+comma_opt ::=
+	COMMA
+	|
+;
+
+if_statement ::=
+	IF LPAREN expression RPAREN statement else_opt
+;
+
+else_opt ::=
+	ELSE statement
+	|
+;
+
+do_statement ::=
+	DO statement WHILE LPAREN expression RPAREN SEMICOLON
+;
+
+while_statement ::=
+	WHILE LPAREN expression RPAREN statement
+;
+
+for_statement ::=
+	FOR LPAREN for_init expression_opt SEMICOLON expression_opt SEMICOLON RPAREN statement
+;
+
+for_init ::=
+	variable_declaration
+	| expression SEMICOLON
+	| SEMICOLON
+;
+
+try_statement ::=
+	TRY statement catch_loop finally_opt
+;
+
+catch_loop ::=
+	CATCH LPAREN parameter RPAREN statement catch_loop
+	|
+;
+
+finally_opt ::=
+	FINALLY statement
+	|
+;
+
+switch_statement ::=
+	SWITCH LPAREN expression RPAREN LBRACE switch_statement_end switch_statement_end_loop RBRACE
+;
+
+switch_statement_end ::=
+	CASE expression COLON
+	| DEFAULT COLON
+	| statement
+	|
+;
+
+switch_statement_end_loop ::=
+	switch_statement_end switch_statement_end_loop
+	|
+;
+
+constructor_declaration ::=
+	modifier_loop IDENTIFIER LPAREN param_list_opt RPAREN statement_block
+;
+
+static_initializer ::=
+	STATIC statement_block
+;
+
+compilation_unit ::=
+	package_statement_opt import_statement_loop type_declaration_loop
+;
+
+package_statement_opt ::=
+	package_statement
+	|
+;
+
+package_statement ::=
+	PACKAGE name SEMICOLON
+;
+
+import_statement_loop ::=
+	import_statement import_statement_loop
+	|
+;
+
+import_statement ::=
+	IMPORT name DOT MULT SEMICOLON SEMICOLON
+	| IMPORT name SEMICOLON
+;
+
+type_declaration_loop ::=
+	type_declaration type_declaration_loop
+	|
+;
+
+type_declaration ::=
+	class_declaration SEMICOLON
+	| interface_declaration SEMICOLON
+;
+
+interface_declaration ::=
+	modifier_loop INTERFACE IDENTIFIER EXTENDS name name_loop LBRACE field_declaration_loop RBRACE
 ;
