@@ -36,64 +36,122 @@ parser code {:
 
 //TERMINALS
 
-terminal BOOLEAN; // primitive_type
-terminal BYTE, SHORT, INT, LONG, CHAR; // integral_type
-terminal D, E, F, X, L; // number representation
-terminal TRUE, FALSE; // boolean terminals 
-terminal NULL; // null terminal
-terminal THREADSAFE; // threadsafe terminal
-terminal FLOAT, DOUBLE; // floating_point_type
-terminal LBRACK, RBRACK; // array_type
-terminal DOT; // qualified_name
-terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, LPAREN, RPAREN, COLON;
-terminal PACKAGE; // package_declaration
-terminal IMPORT; // import_declaration
-terminal PUBLIC, PROTECTED, PRIVATE; // modifier
-terminal STATIC; // modifier
-terminal ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
-terminal ASSERT, CONST, ENUM, GOTO;
-terminal CLASS; // class_declaration
-terminal EXTENDS; // super
-terminal IMPLEMENTS; // interfaces
-terminal VOID; // method_header
-terminal THROWS; // throws
-terminal THIS, SUPER; // explicit_constructor_invocation
-terminal INTERFACE; // interface_declaration
-terminal IF, ELSE; // if_then_statement, if_then_else_statement
-terminal SWITCH; // switch_statement
-terminal CASE, DEFAULT; // switch_label
-terminal DO, WHILE; // while_statement, do_statement
-terminal FOR; // for_statement
-terminal BREAK; // break_statement
-terminal CONTINUE; // continue_statement
-terminal RETURN; // return_statement
-terminal THROW; // throw_statement
-terminal TRY; // try_statement
-terminal CATCH; // catch_clause
-terminal FINALLY; // finally
-terminal NEW; // class_instance_creation_expression
-terminal PLUSPLUS; // postincrement_expression
-terminal MINUSMINUS; // postdecrement_expression
-terminal PLUS, MINUS, COMP, NOT, DIV, MOD;
-terminal LSHIFT, RSHIFT, URSHIFT; // shift_expression
-terminal LT, GT, LTEQ, GTEQ, INSTANCEOF; // relational_expression
-terminal EQEQ, NOTEQ; // equality_expression
-terminal AND; // and_expression
-terminal XOR; // exclusive_or_expression
-terminal OR;  // inclusive_or_expression
-terminal ANDAND; // conditional_and_expression
-terminal OROR; // conditional_or_expression
-terminal QUESTION; // conditional_expression
-terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
-terminal LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
-terminal ANDEQ, XOREQ, OREQ; // assignment_operator
+terminal ABSTRACT;
+terminal ASSERT;
+terminal BOOLEAN;
+terminal BREAK;
+terminal BYTE;
+terminal CASE;
+terminal CATCH;
+terminal CHAR;
+terminal CLASS;
+terminal CONST;
+terminal CONTINUE;
+terminal DEFAULT;
+terminal DO;
+terminal DOUBLE;
+terminal ELSE;
+terminal ENUM;
+terminal EXTENDS;
+terminal FALSE;
+terminal FINAL;
+terminal FINALLY;
+terminal FLOAT;
+terminal FOR;
+terminal IF;
+terminal GOTO;
+terminal IMPLEMENTS;
+terminal IMPORT;
+terminal INSTANCEOF;
+terminal INT;
+terminal INTERFACE;
+terminal LONG;
+terminal NATIVE;
+terminal NEW;
+terminal NULL;
+terminal PACKAGE;
+terminal PRIVATE;
+terminal PROTECTED;
+terminal PUBLIC;
+terminal RETURN;
+terminal SHORT;
+terminal STATIC;
+terminal SUPER;
+terminal SWITCH;
+terminal SYNCHRONIZED;
+terminal THIS;
+terminal THREADSAFE;
+terminal THROW;
+terminal THROWS;
+terminal TRANSIENT;
+terminal TRUE;
+terminal TRY;
+terminal VOID;
+terminal VOLATILE;
+terminal WHILE;
+
+terminal IDENTIFIER;
+terminal FLOAT_LITERAL; 
+terminal DOUBLE_LITERAL;
+
+terminal CHARLITERAL;
+terminal LPAREN;
+terminal RPAREN;
+terminal LBRACE;
+terminal RBRACE;
+terminal LBRACK;
+terminal RBRACK;
+terminal SEMICOLON;
+terminal COLON;
+terminal COMMA;
+terminal DOT;
+terminal QUESTION;
+
+terminal PLUS;
+terminal MINUS;
+terminal MULT;
+terminal DIV;
+terminal MOD;
+
+terminal EQEQ;
+terminal GTEQ;
+terminal LTEQ;
+terminal LT;
+terminal GT;
+terminal OROR;
+terminal ANDAND;
+terminal AND;
+terminal NOT;
+terminal NOTEQ;
+terminal OR;
+terminal XOR;
+terminal URSHIFT;
+terminal LSHIFT;
+terminal RSHIFT;
+terminal URSHIFTEQ;
+
+terminal ASSIGNMENT;
+terminal MINUSASSIGN;
+terminal PLUSASSIGN;
+terminal MULTASSIGN;
+terminal DIVASSIGN;
+terminal MODASSIGN;
+terminal ANDASSIGN;
+terminal XORASSIGN;
+terminal ORASSIGN;
+terminal RSHIFTASSIGN;
+terminal LSHIFTASSIGN;
+terminal AUTOINCRM;
+terminal AUTODECRM;
+terminal COMP;
 
 terminal java.lang.Number INTEGER_LITERAL;
+terminal java.lang.String STRING_LITERAL;
+terminal java.lang.String IDENTIFIER;
+
 terminal java.lang.Number FLOATING_POINT_LITERAL;
 terminal java.lang.Boolean BOOLEAN_LITERAL;
 terminal java.lang.Character CHARACTER_LITERAL;
-terminal java.lang.String STRING_LITERAL;
-terminal java.lang.String IDENTIFIER; // name
 terminal NULL_LITERAL;
 
 // NON TERMINALS
