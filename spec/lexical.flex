@@ -204,6 +204,7 @@ DocumentationComment = "/*" "*"+ [^/*] ~"*/"
  "<<="                           { return symbol(sym.LSHIFTASSIGN, new String(yytext())); }
  "++"                            { return symbol(sym.AUTOINCRM); }
  "--"                            { return symbol(sym.AUTODECRM); }
+ "~"                             { return symbol(sym.COMP); }
 
  }
 
