@@ -53,7 +53,6 @@ terminal DOUBLE;
 terminal ELSE;
 terminal ENUM;
 terminal EXTENDS;
-terminal FALSE;
 terminal FINAL;
 terminal FINALLY;
 terminal FLOAT;
@@ -68,7 +67,6 @@ terminal INTERFACE;
 terminal LONG;
 terminal NATIVE;
 terminal NEW;
-terminal NULL;
 terminal PACKAGE;
 terminal PRIVATE;
 terminal PROTECTED;
@@ -84,17 +82,13 @@ terminal THREADSAFE;
 terminal THROW;
 terminal THROWS;
 terminal TRANSIENT;
-terminal TRUE;
 terminal TRY;
 terminal VOID;
 terminal VOLATILE;
 terminal WHILE;
 
-terminal IDENTIFIER;
-terminal FLOAT_LITERAL; 
-terminal DOUBLE_LITERAL;
+terminal NULL;
 
-terminal CHARLITERAL;
 terminal LPAREN;
 terminal RPAREN;
 terminal LBRACE;
@@ -113,46 +107,44 @@ terminal MULT;
 terminal DIV;
 terminal MOD;
 
+terminal EQ;
+terminal LT;
+terminal GT;
+terminal NOT;
+terminal COMP;
 terminal EQEQ;
 terminal GTEQ;
 terminal LTEQ;
-terminal LT;
-terminal GT;
 terminal OROR;
 terminal ANDAND;
+terminal MINUSMINUS;
+terminal PLUSPLUS;
 terminal AND;
-terminal NOT;
-terminal NOTEQ;
 terminal OR;
 terminal XOR;
 terminal URSHIFT;
 terminal LSHIFT;
 terminal RSHIFT;
+terminal MINUSEQ;
+terminal PLUSEQ;
+terminal MULTEQ;
+terminal DIVEQ;
+terminal MODEQ;
+terminal ANDEQ;
+terminal XOREQ;
+terminal OREQ;
+terminal NOTEQ;
 terminal URSHIFTEQ;
-
-terminal ASSIGNMENT;
-terminal MINUSASSIGN;
-terminal PLUSASSIGN;
-terminal MULTASSIGN;
-terminal DIVASSIGN;
-terminal MODASSIGN;
-terminal ANDASSIGN;
-terminal XORASSIGN;
-terminal ORASSIGN;
-terminal RSHIFTASSIGN;
-terminal LSHIFTASSIGN;
-terminal AUTOINCRM;
-terminal AUTODECRM;
-terminal COMP;
+terminal RSHIFTEQ;
+terminal LSHIFTEQ;
 
 terminal java.lang.Number INTEGER_LITERAL;
 terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String IDENTIFIER;
 
-terminal java.lang.Number FLOATING_POINT_LITERAL;
+terminal java.lang.Number FLOAT_LITERAL;
 terminal java.lang.Boolean BOOLEAN_LITERAL;
-terminal java.lang.Character CHARACTER_LITERAL;
-terminal NULL_LITERAL;
+terminal java.lang.Character CHARLITERAL;
 
 // NON TERMINALS
 
@@ -230,6 +222,8 @@ non terminal import_statement_loop;
 non terminal type_declaration;
 non terminal type_declaration_loop;
 non terminal interface_declaration;
+non terminal identifier_opt;
+non terminal expression_opt;
 
 
 // RULES
@@ -255,7 +249,7 @@ expression ::=
 	| NULL
 	| SUPER 
 	| THIS
-	| identifier 
+	| IDENTIFIER 
 	| LPAREN expression RPAREN
 	| expression expression_div
 ;
@@ -281,13 +275,13 @@ numeric_expression ::=
 
 numeric_expression_diva ::=
 	MINUS expression
-	| AUTODECRM expression
-	| AUTOINCRM expression
+	| MINUSMINUS expression
+	| PLUSPLUS expression
 ;
 
 numeric_expression_divb ::=
-	expression AUTODECRM
-	| expression AUTOINCRM
+	expression MINUSMINUS
+	| expression PLUSPLUS
 ;
 
 numeric_expression_divc ::=
@@ -303,11 +297,11 @@ arithmetical_op ::=
 ;
 
 arithmetical_op_equal ::=
-	PLUSASSIGN
-	| MINUSASSIGN
-	| MULTASSIGN
-	| DIVASSIGN
-	| MODASSIGN
+	PLUSEQ
+	| MINUSEQ
+	| MULTEQ
+	| DIVEQ
+	| MODEQ
 ;
 
 arithmetical_op_equal_opt ::=
@@ -332,8 +326,7 @@ logical_expression ::=
 	NOT expression
 	| expression logical_op_equal_opt expression
 	| expression QUESTION expression COLON expression
-	| TRUE
-	| FALSE
+	| BOOLEAN_LITERAL
 ;
 
 logical_op ::=
@@ -345,11 +338,11 @@ logical_op ::=
 ;
 
 logical_op_equal ::=
-	ANDASSIGN
-	| ORASSIGN
-	| XORASSIGN
-	| ORORASSIGN
-	| MODASSIGN
+	ANDEQ
+	| OREQ
+	| XOREQ
+	| OREQ
+	| MODEQ
 ;
 
 logical_op_equal_opt ::=
@@ -359,7 +352,7 @@ logical_op_equal_opt ::=
 
 string_expression ::=
 	expression PLUS expression
-	| expression PLUSASSIGN expression
+	| expression PLUSEQ expression
 ;
 
 bit_expression ::=
@@ -368,7 +361,7 @@ bit_expression ::=
 ;
 
 bit_expression_op ::=
-	RSHIFTASSIGN
+	RSHIFTEQ
 	| LSHIFT
 	| RSHIFT
 	| URSHIFT
@@ -400,7 +393,7 @@ name ::=
 ;
 
 bracks_loop ::=
-	LBRACK RBRACK bracks_loop;
+	LBRACK RBRACK bracks_loop
 	|
 ;
 
@@ -456,7 +449,7 @@ implements_interfaces_opt ::=
 name_loop ::=
 	COMMA name name_loop
 	|
-}
+;
 
 field_declaration_loop ::=
 	declaration
@@ -514,7 +507,7 @@ statement ::=
 	| SYNCHRONIZED LPAREN expression RPAREN statement
 	| RETURN expression_opt SEMICOLON
 	| THROW expression SEMICOLON
-	| identifier COLON statement
+	| IDENTIFIER COLON statement
 	| BREAK identifier_opt SEMICOLON
 	| CONTINUE identifier_opt SEMICOLON
 	| SEMICOLON
@@ -533,8 +526,8 @@ variable_declarator_loop ::=
 	|
 ;
 
-variable_initializer_opt :==
-	ASSIGNMENT variable_initializer
+variable_initializer_opt ::=
+	EQ variable_initializer
 	|
 ;
 
@@ -654,4 +647,14 @@ type_declaration ::=
 
 interface_declaration ::=
 	modifier_loop INTERFACE IDENTIFIER EXTENDS name name_loop LBRACE field_declaration_loop RBRACE
+;
+
+identifier_opt ::=
+	IDENTIFIER
+	|
+;
+
+expression_opt ::=
+	expression
+	|
 ;
