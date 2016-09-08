@@ -1,8 +1,8 @@
 
-import java.io.FileReader;
+import java.io.Serializable;
 
 
-public class Test extends Main implements Serializable{
+public class TestDefault extends Main implements Serializable {
 	/**
 	 * teste
 	 */
@@ -10,26 +10,14 @@ public class Test extends Main implements Serializable{
 	int[] array;
 	char[] charArray;
 	
-	public Test(){
+	public TestDefault(){
 		this.variable = 10;
 	}
-	
+
 	protected void begginTest(int b, float c, boolean de){
 		boolean a = true;
 		while(a){
 			a=false;
-		}
-	}
-	
-	native void testFor(int a){
-		for(int i=0;i<10;i++){
-			if(a >8){
-				continue;
-			}
-			if(a==9){
-				break;
-			}
-			a=10;
 		}
 	}
 
@@ -39,19 +27,6 @@ public class Test extends Main implements Serializable{
 		boolean a = t && f || t != true || t == f && !f;
 		boolean b = t ^ f;
 
-	}
-
-	public void nullOp() {
-		Object a = null;
-		if(a){
-			a= null;
-		}else{
-			a = new Object();
-		}
-		
-		if(a){
-			System.out.println("a");
-		}
 	}
 
 	public void integers() {
@@ -76,28 +51,11 @@ public class Test extends Main implements Serializable{
 			break;
 		}
 	}
-	
-	public void try_exception(){
-		int a = 10;
-		try{
-			a = null;
-		}catch(Exception e){
-			a = 20;
-		}finally{
-			a = 10;
-		}
-	}	
 
 	public void chars() {
 		char a = 'A';
 		char b = 'B';
 	}
-
-	
-	/** Comment Test. Check that ignores */
-	/**
-	 * Comment test with symbols 987,) _ ++ _ {} ^ ` and more than one line
-	 */
 
 	public void integersOp() {
 		int a = 10;
