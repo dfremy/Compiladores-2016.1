@@ -1,4 +1,4 @@
-package compiler.core;
+package compiler.generated;
 
 public class JavaSymbol extends java_cup.runtime.Symbol {
   private int line;

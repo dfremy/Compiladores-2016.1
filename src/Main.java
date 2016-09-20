@@ -8,7 +8,7 @@ import java.io.FileReader;
 public class Main {
 
     public static void main(String[] args) {
-        String prog = "src/TestDefault.java";
+        String prog = "src/TestDefault.txt";
 
         try{
             Scanner scanner = new Scanner(new FileReader(prog));
