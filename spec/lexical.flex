@@ -1,5 +1,4 @@
 package compiler.generated;
-import java_cup.*;
 import java_cup.runtime.*;
 import compiler.core.*;
 
@@ -38,6 +37,9 @@ import compiler.core.*;
   }
 %}
 
+/* Identifiers */
+Identifier = [:jletter:][:jletterdigit:]*
+
 /* White spaces*/
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | [ \t\f]
@@ -55,7 +57,7 @@ OctLongLiteral    = 0+ 1? {OctDigit} {1,21} [lL]
 OctDigit          = [0-7]
 
 /* Float literals */
-FloatLiteral  = ({Float1}|{Float2}|{Float3}) {Exponent}? [fF]
+FloatLiteral  = ({Float1}|{Float2}|{Float3}) {Exponent}? [fF]?
 DoubleLiteral = ({Float1}|{Float2}|{Float3}) {Exponent}? [dD]
 
 Float1    = [0-9]+ \. [0-9]*
@@ -65,14 +67,11 @@ Exponent = [eE] [+-]? [0-9]+
 
 /* Strings */
 Marker = [\"]
-Other_Symbols = \*|\+|\[|\]|\!|\Â£|\$|\%|\&|\=|\?|\^|\-|\Â°|\#|\@|\:|\(|\)
+Other_Symbols = \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)
 Separators = \r|\n|\r\n\t\f
 Alphanumerics_ = [ a-zA-Z0-9_]
 
-temp = [ \*|\+|\[|\]|\!|\Â£|\$|\%|\&|\=|\?|\^|\-|\Â°|\#|\@|\:|\(|\)|\"|\r|\n|\r\n\t\f a-zA-Z0-9_]*
-
-/* Identifiers */
-Identifier = [:jletter:][:jletterdigit:]*
+temp = [ \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)|\"|\r|\n|\r\n\t\f a-zA-Z0-9_]*
 
 /* String and Character literals */
 StringCharacter = [^\r\n\"\\]
@@ -139,6 +138,9 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
     "true"                          { return symbol(sym.BOOLEAN_LITERAL, new Boolean(true)); }
     "false"                         { return symbol(sym.BOOLEAN_LITERAL, new Boolean(false)); }
 
+    /* Identifier*/
+    {Identifier} 					{ return symbol(sym.IDENTIFIER,yytext());}
+
     {DecimalLiteral}                { return symbol(sym.INTEGER_LITERAL, new Integer(yytext())); }
     {LongLiteral}                   { return symbol(sym.INTEGER_LITERAL, new Long(yytext().substring(0,yylength()-1))); }
 
@@ -174,26 +176,25 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
     /* White spaces */
     {WhiteSpace}				    { /* just ignore it*/}
 
-    /* Assignment */
-    "="							    {return symbol(sym.EQ);}
-
     /* Arithmetical operators*/
-    "+" 							{return symbol(sym.PLUS);}
-    "-" 						    {return symbol(sym.MINUS);}
-    "*" 							{return symbol(sym.MULT);}
-    "/"							    {return symbol(sym.DIV);}
     "++"							{return symbol(sym.PLUSPLUS);}
     "+="							{return symbol(sym.PLUSEQ);}
     "-="							{return symbol(sym.MINUSEQ);}
     "*="						    {return symbol(sym.MULTEQ);}
     "/="				            {return symbol(sym.DIVEQ);}
     "--"							{return symbol(sym.MINUSMINUS);}
-    "%"							    {return symbol(sym.MOD);}
     "%="							{return symbol(sym.MODEQ);}
     "<<"							{return symbol(sym.LSHIFT);}
-    ">>"							{return symbol(sym.RSHIFT);}
     ">>>"							{return symbol(sym.URSHIFT);}
+    ">>"              {return symbol(sym.RSHIFT);}
+    "+"               {return symbol(sym.PLUS);}
+    "-"                 {return symbol(sym.MINUS);}
+    "*"               {return symbol(sym.MULT);}
+    "/"                 {return symbol(sym.DIV);}
+    "%"                 {return symbol(sym.MOD);}
 
+
+    
     /* Operators */
     ":"                             {return symbol(sym.COLON);}
     "~"                             {return symbol(sym.COMP); }
@@ -204,23 +205,26 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
     "<="							{return symbol(sym.LTEQ);}
     "<"							    {return symbol(sym.LT);}
     ">"							    {return symbol(sym.GT);}
-    "||"							{return symbol(sym.OROR);}
-    "||="                           {return symbol(sym.OROREQ);}
+    "||="							{return symbol(sym.OROREQ);}
+    "||"                           {return symbol(sym.OROR);}
     "&&"							{return symbol(sym.ANDAND);}
-    "&"							    {return symbol(sym.AND);}
-    "!"							    {return symbol(sym.NOT);}
     "!="							{return symbol(sym.NOTEQ);}
-    "|"							    {return symbol(sym.OR);}
     "&="							{return symbol(sym.ANDEQ);}
     "|="							{return symbol(sym.OREQ);}
-    "^"						        {return symbol(sym.XOR);}
     "^="                            {return symbol(sym.XOREQ);}
     ">>="							{return symbol(sym.RSHIFTEQ);}
     "<<="							{return symbol(sym.LSHIFTEQ);}
-    "?"                             { return symbol(sym.QUESTION); }
+    "?"               { return symbol(sym.QUESTION); }
+    "!"                 {return symbol(sym.NOT);}
+    "|"                 {return symbol(sym.OR);}
+    "&"                 {return symbol(sym.AND);}
+    "^"                   {return symbol(sym.XOR);}
 
-    /* Identifier*/
-    {Identifier} 					{ return symbol(sym.IDENTIFIER,yytext());}
+
+
+    /* Assignment */
+    "="                 {return symbol(sym.EQ);}
+
 
 }
 
