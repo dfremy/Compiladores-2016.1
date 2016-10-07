@@ -52,11 +52,12 @@ public class SemanticTest{
 	}
 	
 	public void testSwitch(){
-		switch("ola Franklin") {
-			case "ola":
+		int opcao = 10;
+		switch(opcao) {
+			case 10:
 				int b = 10;
 				break;
-			case "Franklin":
+			case 11:
 				int a = 20;
 				break;
 		}

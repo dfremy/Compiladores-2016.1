@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.invoke.SwitchPoint;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ public class CodeGenerator {
 
 	private int labels;
 	private int register;
+	private int lastRegisterUsed;
 	private String assemblyCode;
 	private Register[] registers;
 	private Map<String, Integer> functionAddres;
@@ -24,6 +26,7 @@ public class CodeGenerator {
 	public CodeGenerator() {
 		this.labels = 100;
 		this.register = 0;
+		this.lastRegisterUsed = 0;
 		this.registers = Register.values();
 		this.assemblyCode = initAssemblyCode();
 		this.functionAddres = new HashMap<String, Integer>();
@@ -311,19 +314,19 @@ public class CodeGenerator {
 	public void generateSTCode(Variable variable) {
 		labels += 8;
 		addCode(labels + ": ST " + variable.getIdentifier() + ", " + allocateRegister());
-		this.register = 0;
+		this.register = this.lastRegisterUsed;
 	}
 
 	public void generateSTCode(Register one, Expression exp) {
 		labels += 8;
 		addCode(labels + ": ST " + one + ", " + exp.getAssemblyValue());
-		this.register = 0;
+		this.register = this.lastRegisterUsed;
 	}
 
 	public void generateSTCode(Expression exp) {
 		labels += 8;
 		addCode(labels + ": ST " + exp.getAssemblyValue() + ", " + allocateRegister());
-		this.register = 0;
+		this.register = this.lastRegisterUsed;
 	}
 
 	public void addCode(String assemblyString) {
@@ -403,6 +406,10 @@ public class CodeGenerator {
 			register++; 
 			return allocateRegister();
 		}
+	}
+	
+	public void lastRegisterUsed(int register) {
+		this.lastRegisterUsed = register;
 	}
 	
 	public int getLabels(){

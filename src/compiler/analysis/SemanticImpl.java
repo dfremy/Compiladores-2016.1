@@ -24,7 +24,6 @@ import compiler.exceptions.InvalidTypeException;
 import compiler.exceptions.InvalidVariableException;
 import compiler.generator.CodeGenerator;
 import compiler.util.Calculator;
-import compiler.util.Register;
 
 public class SemanticImpl {
 
@@ -204,6 +203,7 @@ public class SemanticImpl {
 			throw new InvalidTypeException("ERROR: The type of switch expression cannot be null!");
 		}
 		switchExpression = e;
+		codeGenerator.lastRegisterUsed(Integer.valueOf(e.getRegister().getValue().substring(1)));
 	}
 	
 	public void validateCase(Expression e) throws InvalidTypeException {
