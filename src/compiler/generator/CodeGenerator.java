@@ -74,14 +74,20 @@ public class CodeGenerator {
 		generateSTCode(e1);
 	}
 
-	public void generateDIVEQCode(Register r1, Expression e) {
-		generateDIVCode(r1, e.getRegister());
-		generateSTCode(r1, e);
+	public void generateDIVEQCode(Expression e1, Expression e2) {
+		generateLDCode(e1);
+		generateDIVCode(e1.getRegister(), e2.getRegister());
+		generateSTCode(e1);
 	}
 
 	public void generateMODEQCode(Register r1, Expression e) {
 		generateMODCode(r1, e.getRegister());
 		generateSTCode(r1, e);
+	}
+
+	public void generateADDEQCode(Expression e1, Expression e2) {
+		generateMODCode(e1.getRegister(), e2.getRegister());
+		generateSTCode(e1);
 	}
 
 	public void generateORCode(Register r1, Register r2) {
@@ -284,7 +290,7 @@ public class CodeGenerator {
 			register++;
 			labels += 8;
 			r = allocateRegister();
-			addCode(labels + ": LD " + r + ", #" + expression.getAssemblyValue());
+			addCode(labels + ": LD " + r + ", " + expression.getAssemblyValue());
 			expression.setRegister(r);
 		}
 		return r;

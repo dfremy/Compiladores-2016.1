@@ -294,7 +294,7 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
               | bit_expression:be {: Logger.print("Line 260 ");RESULT = be;:}
               | casting_expression:ce {: Logger.print("Line 261 ");RESULT = ce;:}
               | creating_expression:cre {: Logger.print("Line 262 ");RESULT = cre;:}
-              | literal_expression:le {:Logger.print("Line 263, le = " + ((Expression)le).getValue()); RESULT = le; SemanticImpl.getInstance().getCodeGenerator().generateLDCode((Expression) le);:}
+              | literal_expression:le {:Logger.print("Line 263, le = " + ((Expression)le).getValue()); SemanticImpl.getInstance().getCodeGenerator().generateLDCode((Expression) le); RESULT = le; :}
               | logical_expression:lge {: Logger.print("Line 264 "); RESULT = lge;:}
               | method_call:mc {:Logger.print("Line 351 "+ mc); RESULT = mc;:}
               | SUPER:sup {: Logger.print("Line 266 ");RESULT = sup;:}
@@ -315,7 +315,7 @@ attribution ::= IDENTIFIER:id eq_operator:op expression:e    {: Logger.print("Li
 	                                                }else{
 	                                                    SemanticImpl.getInstance().checkVariableAttribution(id, (Expression) e);
 	                                                    Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
-	                                                    ((Expression) e).setAssemblyValue((String) id); var.setValue((Expression) e);
+	                                                    ((Expression) e).setAssemblyValue((String) id); var.setValue((Expression) e); var.getValue().setRegister(var.getRegister());
     												    SemanticImpl.getInstance().generateBaseOpCode((String) op, ((Variable)var).getValue(),(Expression)e);
 	                                                    RESULT = e;
 	                                                }:};
@@ -329,7 +329,7 @@ eq_operator ::=
 				| ANDEQ:op {: Logger.print("Line 324 " + op); RESULT = "&=";:}
 				| OREQ:op {: Logger.print("Line 327 " + op); RESULT = "|=";:}
 				| XOREQ:op {: Logger.print("Line 329 " + op); RESULT = "^=";:}
-				| EQ:op {: Logger.print("Line 529 " + op); RESULT = "+="; :};
+				| EQ:op {: Logger.print("Line 529 " + op); RESULT = "="; :};
 
 numeric_option ::= PLUSPLUS:op {: Logger.print("Line 275"); RESULT = op;:}
                    | MINUSMINUS {: Logger.print("Line 276");:};

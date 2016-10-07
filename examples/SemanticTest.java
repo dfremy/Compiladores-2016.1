@@ -31,11 +31,8 @@ public class SemanticTest{
 		int b = 5 * 10;
 		int c = 10 / 2;
 		int d = 3 - 3;
-		int e = (3*(1 + 2));
-		e /= 2;
-		float f = 2.5;
-		f += 2.5;
-		f += 2;
+		int e = 3 * (1 + 2);
+		float f = 2.0;
 	}
 	
 	public void testLogical(){
@@ -44,11 +41,6 @@ public class SemanticTest{
 		boolean c = true ^ false;
 		boolean d = !a;
 		boolean e = !(b && c);
-		boolean f = e;
-		f &= true;
-		f |= a;
-		d ^= a || b;
-		f = a ^ b;
 	}
 	
 	public void testSwitch(){

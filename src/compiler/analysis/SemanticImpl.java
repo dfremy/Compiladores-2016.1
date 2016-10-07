@@ -588,6 +588,7 @@ public class SemanticImpl {
 	}
 
 	public void generateBaseOpCode(String op, Expression e1, Expression e2) {
+		System.out.println(op);
 		Operation operator = getOperator(op);
 		switch (operator) {
 		case AND_OP:
@@ -630,13 +631,16 @@ public class SemanticImpl {
 			codeGenerator.generateMULCode(e1.getRegister(), e2.getRegister());
 			break;
 		case PLUSEQ:
-			codeGenerator.generateADDCode(e1.getRegister(), e2.getRegister());
+			codeGenerator.generateADDEQCode(e1, e2);
 			break;
 		case DIVEQ:
-			codeGenerator.generateDIVEQCode(e1.getRegister(), e2);
+			codeGenerator.generateDIVEQCode(e1, e2);
 			break;
 		case MODEQ:
 			codeGenerator.generateMODEQCode(e1.getRegister(), e2);
+			break;
+		case EQ_OP:
+			codeGenerator.generateSTCode(e1);
 			break;
 		default:
 			break;
@@ -646,6 +650,8 @@ public class SemanticImpl {
 
 	private Operation getOperator(String op) {
 		switch (op) {
+		case "=":
+			return Operation.EQ_OP;
 		case "+":
 			return Operation.PLUS;
 		case "-":
@@ -663,7 +669,7 @@ public class SemanticImpl {
 		case "/=":
 			return Operation.DIVEQ;
 		case "==":
-			return Operation.EQ_OP;
+			return Operation.EQEQ_OP;
 		case "!=":
 			return Operation.NE_OP;
 		case "&&":
