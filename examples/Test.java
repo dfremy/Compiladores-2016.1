@@ -7,12 +7,13 @@ import java.io.Serializable;
 
 
 public class Test extends Main implements Serializable {
-    public void begginTest(){
+
+	public void begginTest(){
 		boolean a = true;
 	}
 
 	public void logicalOP() {
-        boolean t = true;
+        boolean t = (int) true;
         boolean f = false;
         boolean a = t && f || t != true || t == f && !f;
         boolean b = t ^ f;
@@ -24,7 +25,7 @@ public class Test extends Main implements Serializable {
     }
 
     public void integers() {
-        int a = 10;
+        int a = "1";
         int b = 20;
     }
 
@@ -48,8 +49,6 @@ public class Test extends Main implements Serializable {
         float j = a /= 2;
         int g = a++;
         int p = b--;
-
-        if(true) { int a = 10; }
     }
 
     public void floats() {
@@ -59,9 +58,8 @@ public class Test extends Main implements Serializable {
     }
 
 
-    /** Por algum motivo não esta conseguindo usar palavra como String, Object ou qualquer outra classe criada como tipo */
     public void strings(){
-        char palavra = "bla bla";
+        char a = "";
         char b = "test";
         char c = "AaDa";
         char d = "Aa";
@@ -73,6 +71,8 @@ public class Test extends Main implements Serializable {
                 + "dhywgdywqgsuqjsiqjs uwhs "
                 + "Mauhsuwswijsiks wuhedywghdwujsoqwks dhywgdywqgsuqjsiqjs uwhs";
         char g = "!:_)(*&&*)oiiis";
+        String a = "testeString";
+        String c = a + "testeConcat";
     }
 
     public void testingWhile(int x, int y){
@@ -80,10 +80,9 @@ public class Test extends Main implements Serializable {
             x = y + 1;
         }
     }
-
-    public void testfor(){
-        for(int i = 0; i < 10 ; i++){
-            x = 2;
-        }
+    
+    public void testBooleanErrors(){
+    	boolean a = 1 + 2;
     }
+    
 }

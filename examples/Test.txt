@@ -1,0 +1,24 @@
+package examples;
+
+import compiler.main.Main;
+
+
+public class Test {
+    int a;
+    int b = 10;
+	public int begginTest(){
+		int a = b;
+        return a;
+	}
+    public int aain(){
+        int a = 1;
+        a = 1 + 2;
+        return a;
+    }
+    
+    public boolean testRelacionalExpressions(){
+    	boolean c = 2 == 4;
+    	return c;
+    }
+
+}

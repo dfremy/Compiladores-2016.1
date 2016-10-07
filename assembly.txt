@@ -1,0 +1,83 @@
+100: LD SP, #8000
+108: LD R2, #10
+116: ST a, R2
+124: LD R2, #5
+132: ST a, R2
+140: LD R2, #5
+
+
+448: LD R3, #5
+
+
+
+
+1056: LD R4, #10
+1064: ST a, R4
+1072: LD R2, #10
+1080: ST b, R2
+
+
+1388: LD R2, #10
+1396: ST a, R2
+
+
+1704: LD R2, #5
+1712: LD R3, #5
+1720: ADD R4, R2, R3
+1728: ST a, R4
+1736: LD R2, #3
+1744: LD R3, #1
+1752: LD R4, #2
+1760: ADD R5, R3, R4
+1768: MUL R6, R2, R5
+1776: ST e, R6
+1784: LD R2, #5
+1792: LD R3, #10
+1800: MUL R4, R2, R3
+1808: ST b, R4
+1816: LD R2, #10
+1824: LD R3, #2
+1832: DIV R4, R2, R3
+1840: ST c, R4
+1848: LD R2, #3
+1856: LD R3, #3
+1864: SUB R4, R2, R3
+1872: ST d, R4
+
+
+2180: LD R2, #true
+2188: LD R3, #false
+2196: AND R4, R2, R3
+2204: ST a, R4
+2212: LD R2, #true
+2220: LD R3, #false
+2228: OR R4, R2, R3
+2236: ST b, R4
+2244: LD R2, #true
+2252: LD R3, #false
+2260: XOR R4, R2, R3
+2268: ST c, R4
+2276: LD R2, a
+2284: XOR R3, R2, #true
+2292: ST d, R3
+2300: LD R2, b
+2308: LD R3, c
+2316: AND R4, R2, R3
+2324: XOR R5, R4, #true
+2332: ST e, R5
+2340: ST f, R1
+
+
+2648: LD R2, #ola Franklin
+2656: LD R3, #ola
+2664: SUB R4, R2, R3
+2672: BNEQZ R4, #caseEnd
+2680: LD R5, #10
+2688: ST b, R5
+2696: LD R2, #Franklin
+2704: SUB R3, R2, R2
+2712: BNEQZ R3, #caseEnd
+2720: LD R4, #20
+2728: ST a, R4
+
+

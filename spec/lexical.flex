@@ -1,4 +1,5 @@
 package compiler.generated;
+import java_cup.*;
 import java_cup.runtime.*;
 import compiler.core.*;
 
@@ -67,11 +68,11 @@ Exponent = [eE] [+-]? [0-9]+
 
 /* Strings */
 Marker = [\"]
-Other_Symbols = \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)
+Other_Symbols = \*|\+|\[|\]|\!|\Â£|\$|\%|\&|\=|\?|\^|\-|\Â°|\#|\@|\:|\(|\)
 Separators = \r|\n|\r\n\t\f
 Alphanumerics_ = [ a-zA-Z0-9_]
 
-temp = [ \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)|\"|\r|\n|\r\n\t\f a-zA-Z0-9_]*
+temp = [ \*|\+|\[|\]|\!|\Â£|\$|\%|\&|\=|\?|\^|\-|\Â°|\#|\@|\:|\(|\)|\"|\r|\n|\r\n\t\f a-zA-Z0-9_]*
 
 /* String and Character literals */
 StringCharacter = [^\r\n\"\\]

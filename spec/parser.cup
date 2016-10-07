@@ -2,419 +2,780 @@ import java_cup.runtime.*;
 import compiler.core.*;
 import compiler.analysis.*;
 import compiler.util.*;
-import java.util.ArrayList;
 
-parser code  {:
- public void report_error(String message, Object info) {
-   StringBuffer m = new StringBuffer("Error ");
 
-   if (info instanceof java_cup.runtime.Symbol)
-     m.append( "("+info.toString()+")" );
+parser code  {: 
+  public void report_error(String message, Object info) {
+    StringBuffer m = new StringBuffer("Error ");
 
-   m.append(" : "+message);
-
-   System.out.println(m);
- }
-
- public void report_fatal_error(String message, Object info) {
-   report_error(message, info);
-   throw new RuntimeException("Fatal Syntax Error");
- }
+    if (info instanceof java_cup.runtime.Symbol) 
+      m.append( "("+info.toString()+")" );
+     
+    m.append(" : "+message);
+   
+    System.out.println(m);
+  }
+   
+  public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    throw new RuntimeException("Fatal Syntax Error");
+  }
 :};
 
-terminal BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, TRUE, FALSE, FLOAT, DOUBLE;
+terminal BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, TRUE, FALSE, NULL, FLOAT, DOUBLE; 
 terminal DOT, SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
 terminal PACKAGE, IMPORT, PUBLIC, PROTECTED, PRIVATE, THREADSAFE, STATIC, ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
 terminal CLASS, EXTENDS, IMPLEMENTS, VOID, THROWS, THIS, SUPER, INTERFACE; // interface_declaration
-terminal IF, ELSE, SWITCH, CASE, DEFAULT, DO, WHILE, FOR, BREAK, CONTINUE, RETURN, THROW, TRY, CATCH, FINALLY, NEW;
+terminal IF, ELSE, SWITCH, CASE, DEFAULT, DO, WHILE, FOR, BREAK, CONTINUE, RETURN, THROW, TRY, CATCH, FINALLY, NEW; 
 terminal PLUSPLUS, MINUSMINUS, PLUS, MINUS, COMP, NOT, DIV, MOD;
-terminal LBRACK, RBRACK, LSHIFT, RSHIFT, URSHIFT, LT, GT, LTEQ, GTEQ, INSTANCEOF;
-terminal EQEQ, NOTEQ, AND, XOR, OR, ANDAND, OROR, OROREQ, QUESTION;
-terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ, LSHIFTEQ, RSHIFTEQ, URSHIFTEQ, ANDEQ, XOREQ, OREQ;
+terminal LBRACK, RBRACK, LSHIFT, RSHIFT, URSHIFT, LT, GT, LTEQ, GTEQ, INSTANCEOF; 
+terminal EQEQ, NOTEQ, AND, XOR, OR, ANDAND, OROR, QUESTION; 
+terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ, LSHIFTEQ, RSHIFTEQ, URSHIFTEQ, ANDEQ, XOREQ, OREQ; 
 
 terminal java.lang.Number INTEGER_LITERAL;
 terminal java.lang.Number FLOATING_POINT_LITERAL;
 terminal java.lang.Boolean BOOLEAN_LITERAL;
 terminal java.lang.Character CHARACTER_LITERAL;
 terminal java.lang.String STRING_LITERAL;
-terminal java.lang.String IDENTIFIER;
+terminal java.lang.String CHARLITERAL;
+terminal java.lang.String IDENTIFIER; // name
 terminal NULL_LITERAL;
 
+
+non terminal goal;
+non terminal literal;
+
+non terminal type, primitive_type, numeric_type;
+non terminal integral_type, floating_point_type;
+non terminal reference_type;
+non terminal class_or_interface_type;
+non terminal class_type, interface_type;
+non terminal array_type;
+
+non terminal name, simple_name, qualified_name;
+
 non terminal compilation_unit;
-non terminal type_declaration, class_declaration, modifier, modifier_loop,entity_name;
-non terminal package_declaration, package_declaration_opt, package_name, class_name, interface_name;
-non terminal extends_declaration_opt, implements_declaration_opt, implements_loop, extends_interface_declaration_opt;
-non terminal field_declaration, field_declaration_loop;
-non terminal method_declaration, constructor_declaration, variable_declaration, static_initializer;
-non terminal import_statement, import_aux, import_statement_loop;
-non terminal type, type_specifier, interface_declaration, interface_declaration_loop;
-non terminal statement, statement_block, statement_loop;
-non terminal brack_loop, brack;
-non terminal parameter, parameter_list_opt, parameter_list;
-non terminal variable_initializer_opt, variable_declarator_loop, variable_declarator;
-non terminal variable_initializer, attr_opt;
-non terminal variable_initializer_loop, comma_opt;
-non terminal if_statement, else_opt;
-non terminal expression, expression_opt, expression_end_option, expression_loop;
-non terminal do_statement, while_statement, for_statement;
-non terminal for_div_1;
-non terminal try_statement, catch_loop, finally_opt;
-non terminal switch_statement, switch_clausulas_loop, switch_clausulas;
+non terminal package_declaration_opt, package_declaration;
+non terminal import_declarations_opt, import_declarations;
+non terminal type_declarations_opt, type_declarations;
+non terminal import_declaration;
+non terminal single_type_import_declaration;
+non terminal type_import_on_demand_declaration;
+non terminal type_declaration;
+
+non terminal modifiers_opt, modifiers, modifier;
+non terminal class_declaration, super_cl, super_opt;
+non terminal interfaces, interfaces_opt, interface_type_list;
+non terminal class_body;
+non terminal class_body_declarations, class_body_declarations_opt;
+non terminal class_body_declaration, class_member_declaration;
+
+non terminal field_declaration, variable_declarators, variable_declarator;
+non terminal variable_declarator_id, variable_initializer;
+
+non terminal method_declaration, method_header, method_declarator;
+non terminal formal_parameter_list_opt, formal_parameter_list;
+non terminal formal_parameter;
+non terminal throws_opt, throws;
+non terminal class_type_list, method_body;
+
+non terminal static_initializer;
+
+non terminal constructor_declaration, constructor_declarator;
+non terminal constructor_body;
+non terminal explicit_constructor_invocation;
+
+non terminal interface_declaration;
+non terminal extends_interfaces_opt, extends_interfaces;
+non terminal interface_body;
+non terminal interface_member_declarations_opt, interface_member_declarations;
+non terminal interface_member_declaration, constant_declaration;
+non terminal abstract_method_declaration;
+
+non terminal array_initializer;
+non terminal variable_initializers;
+
+non terminal block;
+non terminal block_statements_opt, block_statements, block_statement;
+non terminal local_variable_declaration_statement, local_variable_declaration;
+non terminal statement, statement_no_short_if;
+non terminal statement_without_trailing_substatement;
+non terminal empty_statement;
+non terminal labeled_statement, labeled_statement_no_short_if;
+non terminal expression_statement, statement_expression;
+non terminal if_then_statement;
+non terminal if_then_else_statement, if_then_else_statement_no_short_if;
+non terminal switch_statement, switch_block;
+non terminal switch_block_statement_groups;
+non terminal switch_block_statement_group;
+non terminal switch_labels, switch_label;
+non terminal while_statement, while_statement_no_short_if;
+non terminal do_statement;
+non terminal for_statement, for_statement_no_short_if;
+non terminal for_init_opt, for_init;
+non terminal for_update_opt, for_update;
+non terminal statement_expression_list;
 non terminal identifier_opt;
-non terminal end_option;
-non terminal numeric_expression, testing_expression, logical_expression, string_expression;
-non terminal bit_expression, casting_expression, creating_expression, literal_expression;
-non terminal numeric_option,  middle_operator;
-non terminal testing_option, logical_option, string_operation, bit_operation;
-non terminal arglist_opt;
-non terminal creating_expression_option, creating_expression_end_option;
-non terminal attribution;
+non terminal break_statement, continue_statement;
+non terminal return_statement, throw_statement;
+non terminal synchronized_statement, try_statement;
+non terminal catches_opt, catches, catch_clause;
+non terminal finally;
 
-start with compilation_unit;
+non terminal primary, primary_no_new_array;
+non terminal class_instance_creation_expression;
+non terminal argument_list_opt, argument_list;
+non terminal array_creation_expression;
+non terminal dim_exprs, dim_expr, dims_opt, dims;
+non terminal field_access, method_invocation, array_access;
+non terminal postfix_expression;
+non terminal postincrement_expression, postdecrement_expression;
+non terminal unary_expression, unary_expression_not_plus_minus;
+non terminal preincrement_expression, predecrement_expression;
+non terminal cast_expression;
+non terminal multiplicative_expression, additive_expression;
+non terminal shift_expression, relational_expression, equality_expression;
+non terminal and_expression, exclusive_or_expression, inclusive_or_expression;
+non terminal conditional_and_expression, conditional_or_expression;
+non terminal conditional_expression, assignment_expression;
+non terminal assignment;
+non terminal left_hand_side;
+non terminal assignment_operator;
+non terminal expression_opt, expression;
+non terminal constant_expression;
 
-type_specifier ::= 
-  BOOLEAN   {:RESULT = new Type("boolean"); Logger.print("BOOLEAN at line 71");:} 
-| BYTE 		{:RESULT = new Type("byte"); Logger.print("BYTE at line 72");:} 
-| CHAR 		{:RESULT = new Type("char");Logger.print("CHAR at line 73");:}
-| SHORT		{:RESULT = new Type("short");Logger.print("SHORT at line 74");:}
-| INT		{:RESULT = new Type("int");Logger.print("INT at line 75");:}
-| FLOAT		{:RESULT = new Type("float");Logger.print("FLOAT at line 76");:}
-| LONG		{:RESULT = new Type("long");Logger.print("LONG at line 77");:}
-| DOUBLE 	{:RESULT = new Type("double");Logger.print("DOUBLE at line 78");:}
-| VOID 		{:RESULT = new Type("void");Logger.print("VOID at line 79");:}
-| entity_name:en {:Logger.print("Line 84");Type t = new Type((String) en); RESULT = t;:};
+start with goal;
+
+goal ::=	compilation_unit
+	;
+
+literal ::=	INTEGER_LITERAL
+	|	FLOATING_POINT_LITERAL
+	|	BOOLEAN_LITERAL
+	|	CHARACTER_LITERAL
+	|	STRING_LITERAL
+	|	NULL_LITERAL
+	;
+
+type	::=	primitive_type
+	|	reference_type
+	;
+primitive_type ::=
+		numeric_type
+	|	BOOLEAN
+	;
+numeric_type::=	integral_type
+	|	floating_point_type
+	;
+integral_type ::= 
+		BYTE  {:RESULT = new Type("byte"); Logger.print("BYTE at line 150");:} 
+	|	SHORT {:RESULT = new Type("short");Logger.print("SHORT at line 150");:}
+	|	INT {:RESULT = new Type("int");Logger.print("INT at line 150");:}
+	|	LONG  {:RESULT = new Type("long");Logger.print("LONG at line 150");:}
+	|	CHAR  {:RESULT = new Type("char");Logger.print("CHAR at line 150");:}
+	;
+floating_point_type ::= 
+		FLOAT  {:RESULT = new Type("float");Logger.print("FLOAT at line 150");:}
+	|	DOUBLE {:RESULT = new Type("double");Logger.print("DOUBLE at line 150");:}
+	;
+
+reference_type ::=
+		class_or_interface_type
+	|	array_type
+	;
+class_or_interface_type ::= name;
+
+class_type ::=	class_or_interface_type;
+interface_type ::= class_or_interface_type;		
+
+array_type ::=	primitive_type dims
+	|	name dims
+	;
+
+name	::=	simple_name
+	|	qualified_name
+	;
+simple_name ::=	IDENTIFIER
+	;
+qualified_name ::=
+		name DOT IDENTIFIER
+	;
 
 compilation_unit ::=
-   package_declaration_opt import_statement_loop type_declaration {: Logger.print("Line 87");:}
-;
-
-package_declaration ::=
-   PACKAGE entity_name SEMICOLON {:Logger.print("Line 91");:}
-;
-
-package_declaration_opt ::=  {:Logger.print("Line 94");:}
-							| package_declaration {:Logger.print("95");:};
-
-//import
-
-import_statement_loop ::=	{:Logger.print("Line 99");:}
-    						| import_statement import_statement_loop {:Logger.print("100");:}
-;
-
-import_statement ::=
-					IMPORT import_aux SEMICOLON {:Logger.print("103");:}
-;
-
-import_aux ::=
-			  entity_name DOT MULT {:Logger.print("107");:}
-			| entity_name {:Logger.print("Line 109");:}
-;
-
-//type   
-type_declaration ::=  class_declaration  {:Logger.print("Line 113");:}
-					| interface_declaration {:Logger.print("Line 114");:};
-
-entity_name ::= IDENTIFIER:i {:Logger.print("Line 116"); RESULT = i;:}
-				| entity_name DOT IDENTIFIER {:Logger.print("Line 117");:};
-
-extends_declaration_opt ::= {:Logger.print("Line 119");:}
-							| EXTENDS entity_name {:Logger.print("Line 120");:};
-
-implements_declaration_opt ::= {:Logger.print("Line 122");:} 
-							| IMPLEMENTS implements_loop {:Logger.print("123");:};
-
-implements_loop ::= entity_name {:Logger.print("Line 125");:}
-					| entity_name COMMA implements_loop {:Logger.print("126");:};
-
-class_declaration ::= modifier_loop CLASS IDENTIFIER:id {:Type t = new Type(id); SemanticImpl.getInstance().addType(t);:} extends_declaration_opt implements_declaration_opt LBRACE field_declaration_loop RBRACE {:Logger.print("Line 128");:};
-
-field_declaration ::= method_declaration {:Logger.print("Line 130");:}
-					| constructor_declaration {:Logger.print("Line 131");:}
-				    | variable_declaration {:Logger.print("132");:}
-				    | static_initializer {:Logger.print("Line 133");:}
-				    | SEMICOLON {:Logger.print("Line 134");:};
-
-method_declaration ::= modifier_loop type:t IDENTIFIER:id LPAREN parameter_list_opt:p RPAREN end_option:ep {:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t, (Expression) ep);:};
-
-constructor_declaration ::= modifier_loop IDENTIFIER LPAREN parameter_list_opt RPAREN statement_block {:Logger.print("Line 138");:};
-
-variable_declaration ::= type:t variable_declarator_loop:v SEMICOLON {:Logger.print("Line 140"); Variable var = new Variable((String) v, (Type) t); SemanticImpl.getInstance().addVariable(var);:}
-						 | modifier_loop type variable_declarator_loop SEMICOLON {:Logger.print("Line 141");:};
-
-modifier ::=  PUBLIC {:Logger.print("Line 143");:} 
-			| PRIVATE {:Logger.print("Line 144");:}
-			| PROTECTED {:Logger.print("Line 145");:}
-			| STATIC {:Logger.print("Line 146");:} 
-			| FINAL {:Logger.print("Line 147");:}
-			| NATIVE {:Logger.print("Line 148");:}
-			| SYNCHRONIZED {:Logger.print("Line 149");:}
-			| ABSTRACT {:Logger.print("Line 150");:}
-			| THREADSAFE {:Logger.print("Line 151");:}
-			| TRANSIENT {:Logger.print("Line 152");:};
-
-modifier_loop ::= {:Logger.print("Line 154");:} 
-				| modifier modifier_loop {:Logger.print("155");:}
-;
-
-variable_declarator_loop ::= variable_declarator:v {:Logger.print("Line 158"); RESULT = v;:}
-							 | variable_declarator COMMA variable_declarator_loop {:Logger.print("Line 159");:};
-
-variable_declarator ::= IDENTIFIER:id brack_loop attr_opt:a {:Logger.print("Line 161"); SemanticImpl.getInstance().validateVariable(id); RESULT = id;:};
-
-attr_opt ::= {:Logger.print("Line 163");:}
-			| EQ variable_initializer:v {:Logger.print("164"); RESULT = v;:}
-			;
-
-variable_initializer ::= expression:e {:Logger.print("Line 167 - Teste de Exp " + e); RESULT = e;:}
-						 | LBRACE variable_initializer_opt RBRACE {:Logger.print("Line 168");:}
-						 | IDENTIFIER:i {:RESULT = i; Logger.print("Line 169"); RESULT = i;:}
-						 ;
-
-variable_initializer_opt ::= {:Logger.print("Line 172");:}
-							| variable_initializer_loop comma_opt {:Logger.print("Line 173");:};
-
-variable_initializer_loop ::= variable_initializer:v {:Logger.print("Line 175"); RESULT = v;:} 
-							| variable_initializer COMMA variable_initializer_loop {:Logger.print("Line 176");:};
-
-comma_opt ::= {:Logger.print("Line178");:} 
-			| COMMA {:Logger.print("Line 179");:};
-
-static_initializer ::= IDENTIFIER {:Logger.print("Line 181");:};
-
-brack ::= LBRACK RBRACK {:Logger.print("Line 183");:};
-
-brack_loop ::= {:Logger.print("Line 185");:} 
-				| brack brack_loop {:Logger.print("Line 186");:};
-
-type ::= type_specifier:t brack_loop {:Logger.print("Line 188"); RESULT = t;:};
-
-parameter ::= type:t IDENTIFIER:id brack_loop {:Logger.print("Line 189 "+t); RESULT = new Variable(id,(Type)t);:};
-
-parameter_list_opt ::= {:Logger.print("Line 192");:} 
-					| parameter_list:pl {:Logger.print("Line 193"); RESULT = pl;:};
-
-parameter_list ::= parameter:p {:Logger.print("Line 195"); RESULT =  ListCreator.newList(p);:} 
-					| parameter:p COMMA parameter_list:pl {:Logger.print("Line 196"); ((ArrayList<Parameter>) pl).add((Parameter)p); RESULT = pl;:};
-
-extends_interface_declaration_opt ::= {:Logger.print("Line 198");:} 
-									| EXTENDS implements_loop {:Logger.print("Line 199");:};
-
-interface_declaration ::= modifier_loop INTERFACE IDENTIFIER extends_interface_declaration_opt LBRACE field_declaration_loop RBRACE {:Logger.print("Line 201");:};
-
-field_declaration_loop ::= 
-	{:Logger.print("Line 204");:}
-    | field_declaration field_declaration_loop {:Logger.print("Line 205");:}
-;
-
-field_declaration ::=
-    | method_declaration {:Logger.print("209");:}
-    | constructor_declaration {:Logger.print("210");:}
-    | variable_declaration {:Logger.print("211");:}
-    | static_initializer {:Logger.print("212");:}
-;
-
-statement_block ::=  
-	LBRACE statement_loop RBRACE {:Logger.print("Line 216");:};
-
-statement ::= variable_declaration {: Logger.print("Line 218");:}
-              | expression SEMICOLON {: Logger.print("Line 219");:}
-              | statement_block {: Logger.print("Line 220");:}
-              | if_statement {: Logger.print("Line 221");:}
-              | do_statement {: Logger.print("Line 222");:}
-              | while_statement {: Logger.print("Line 223");:}
-              | for_statement {: Logger.print("Line 224");:}
-              | try_statement {: Logger.print("Line 225");:}
-              | switch_statement {: Logger.print("Line 226");:}
-              | SYNCHRONIZED LPAREN expression RPAREN statement {: Logger.print("Line 227");:}
-              | RETURN expression_opt:ep SEMICOLON {: Logger.print("Line 228 "+ep); RESULT = ep;:}
-              | THROW expression SEMICOLON {: Logger.print("Line 229");:}
-              | COLON statement {: Logger.print("Line 230");:}
-              | BREAK identifier_opt SEMICOLON {: Logger.print("Line 231");:}
-              | CONTINUE identifier_opt SEMICOLON {: Logger.print("Line 232");:}
-              | SEMICOLON {: Logger.print("Line 233");:};
-
-statement_loop ::= 
-	{: Logger.print("Line 236");:}
-	| statement statement_loop {: Logger.print("Line 237");:};
-
-end_option ::= 
-	statement_block:st {: Logger.print("Line 240"); RESULT = st;:}
-	| SEMICOLON {: Logger.print("Line 241");:};
-
-if_statement ::= 
-	IF LPAREN expression RPAREN statement else_opt {: Logger.print("Line 244");:};
-
-statement_block ::= 
-	 LBRACE statement:st RBRACE {: Logger.print("Line 247 "); RESULT = st;:};
-
-else_opt ::= 
-	{: Logger.print("Line 250");:}
-	| ELSE statement {: Logger.print("Line 251");:};
-
-do_statement ::= DO statement WHILE LPAREN expression RPAREN COMMA {: Logger.print("Line 253");:};
-
-while_statement ::= WHILE LPAREN expression RPAREN statement {: Logger.print("Line 255");:};
-
-expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT = ne;:}
-              | testing_expression:te {: Logger.print("Line 258 ");RESULT = te;:}
-              | string_expression:se {: Logger.print("Line 259 ");RESULT = se;:}
-              | bit_expression:be {: Logger.print("Line 260 ");RESULT = be;:}
-              | casting_expression:ce {: Logger.print("Line 261 ");RESULT = ce;:}
-              | creating_expression:cre {: Logger.print("Line 262 ");RESULT = cre;:}
-              | literal_expression:le {:Logger.print("Line 263, le = "); RESULT = le;:}
-              | logical_expression:lge {: Logger.print("Line 264 ");RESULT = lge;:}
-              | NULL_LITERAL:nl {: Logger.print("Line 265 ");RESULT = nl;:}
-              | SUPER:sup {: Logger.print("Line 266 ");RESULT = sup;:}
-              | THIS:th {: Logger.print("Line 267 ");RESULT = th;:}
-              | IDENTIFIER:id {: Logger.print("Line 268 ");RESULT = id;:}
-              | attribution:attr {: Logger.print(" Line 269 ");RESULT = attr;:}
-              | LPAREN expression LPAREN {: Logger.print("LINE 270");:}
-              | expression expression_end_option {: Logger.print("LINE 271");:};
-
-attribution ::= IDENTIFIER EQ expression {: Logger.print("Line 273");:};
-
-numeric_option ::= PLUSPLUS:op {: Logger.print("Line 275"); RESULT = op;:}
-                   | MINUSMINUS {: Logger.print("Line 276");:};
-
-for_statement ::= 
-	FOR LPAREN for_div_1 expression_opt SEMICOLON expression_opt RPAREN statement_block {: Logger.print("Line 278");:};
-	
-middle_operator ::= 
-	PLUS {: Logger.print("Line 282");:}
-	| PLUSEQ {: Logger.print("Line 283");:}
-	| MINUS {: Logger.print("Line 284");:}
-	| MINUSEQ {: Logger.print("Line 285");:}
-	| MULT {: Logger.print("Line 286");:}
-	| MULTEQ {: Logger.print("Line 287");:}
-	| DIV {: Logger.print("Line 288");:}
-	| DIVEQ {: Logger.print("Line 289");:}
-	| MOD {: Logger.print("Line 290");:}
-	| MODEQ {: Logger.print("Line 291");:};
-
-for_div_1 ::= 
-	variable_declaration {: Logger.print(" Line 294");:}
-	| expression SEMICOLON {: Logger.print(" Line 295");:}
-	| SEMICOLON {: Logger.print("Line 296");:};
-
-numeric_expression ::= MINUS expression:e {: Logger.print("Line 298"); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT = e;:}
-                       | numeric_option expression {: Logger.print("Line 299");:}
-					   | expression:e numeric_option:no {:Logger.print("Line 300, numeric_option:" + "  "); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
-					   | expression:le middle_operator:md expression:re {:Logger.print("Linha 301 " + ((Expression) le).getValue() + md +((Expression) re).getValue()); SemanticImpl.getInstance().isNumericExpression((Expression) le,(Expression) re);:}
-					   ;
-
-expression_opt  ::= 
-	{: Logger.print("Line 305");:}
-	| expression:e {: Logger.print("Line 306 "+e); RESULT = e;:};
-
-testing_option ::= 
-	  GT {: Logger.print("Line 309");:}
-	| LT {: Logger.print("Line 310");:}
-	| GTEQ {: Logger.print("Line 311");:}
-	| LTEQ {: Logger.print("Line 312");:}
-	| EQEQ {: Logger.print("Line 313");:}
-	| NOTEQ {: Logger.print("Line 314");:};
-
-testing_expression ::= 
-	expression testing_option expression {: Logger.print("Line 317");:};
-
-try_statement ::= 
-	TRY statement catch_loop finally_opt {: Logger.print("Line 320");:};
-
-logical_option ::=  
-	  AND {: Logger.print("Line 323");:}
-	| ANDEQ {: Logger.print("Line 324");:}
-	| OR {: Logger.print("Line 325");:}
-	| OROR {: Logger.print("Line 326");:}
-	| OREQ {: Logger.print("Line 327");:}
-	| XOR {: Logger.print("Line 328");:}
-	| XOREQ {: Logger.print("Line 329");:}
-	| ANDAND {: Logger.print("Line 330");:}
-	| OROREQ {: Logger.print("Line 331");:}
-	| MOD {: Logger.print("Line 332");:}
-	| MODEQ {: Logger.print("Line 333");:};
-
-
-catch_loop ::= 
-	{: Logger.print("Line 337");:}
-	| CATCH LPAREN parameter RPAREN statement catch_loop {: Logger.print("Line 338");:};
-
-string_operation ::=
-	PLUS {: Logger.print("Line 341");:}
-	| PLUSEQ {: Logger.print("Line 342");:};
-
-finally_opt ::= 
-	{: Logger.print("Line 345");:}
-	| FINALLY statement {: Logger.print("Line 346");:};
-
-string_expression ::= 
-	expression string_operation expression {: Logger.print("Line 349");:};
-
-switch_statement ::= 
-	SWITCH LPAREN expression RPAREN LBRACE switch_clausulas_loop RBRACE {: Logger.print("Line 352");:};
-
-bit_operation ::= 
-	 RSHIFTEQ {: Logger.print("Line 355");:}
-	| LSHIFT {: Logger.print("Line 356");:}
-	| RSHIFT {: Logger.print("Line 357");:}
-	| URSHIFT {: Logger.print("Line 358");:};
-
-casting_expression ::= 
-	LPAREN type RPAREN expression {: Logger.print("Line 361");:};
-
-bit_expression ::= 
-	COMP expression {: Logger.print("Line 364");:} 
-	| expression bit_operation expression {: Logger.print("Line 365");:};
-
-switch_clausulas_loop ::= 
-	  {: Logger.print("Line 368");:}
-	| switch_clausulas switch_clausulas_loop {: Logger.print("Line 369");:};
-
-creating_expression ::= 
-	NEW creating_expression_end_option {: Logger.print("Line 372");:};
-
-creating_expression_end_option ::=
-      entity_name LPAREN arglist_opt RPAREN {: Logger.print("Line 375");:}
-    | type_specifier creating_expression_option brack_loop {: Logger.print("Line 376");:}
-    | LPAREN expression RPAREN {: Logger.print("Line 377");:};
-
-creating_expression_option ::= 
-	  {: Logger.print("Line 380");:}
-	| RPAREN expression LPAREN {: Logger.print("Line 341");:};
-
-switch_clausulas ::= 
-	 CASE expression COLON {: Logger.print("Line 384");:}
-	| DEFAULT COLON {: Logger.print("Line 385");:}
-	| statement {: Logger.print("Line 386");:};
-
-literal_expression ::=  INTEGER_LITERAL:i {:RESULT = new Expression(new Type("int"), i.toString());Logger.print("Linha 388, valor do I: "+i);:}
-						| FLOATING_POINT_LITERAL:f {:RESULT = new Expression(new Type("float"), f.toString());Logger.print("Linha 389, valor do f: "+f);:}
-						| BOOLEAN_LITERAL:b {:RESULT = new Expression(new Type("boolean"), b.toString());Logger.print("Linha 390, valor do B: "+b);:}
-						| CHARACTER_LITERAL:c{:RESULT = new Expression(new Type("char"), c.toString());Logger.print("Linha 391, valor do C: "+c);:}
-                        | STRING_LITERAL:s {:RESULT = new Expression(new Type("string"), s.toString());Logger.print("Linha 392, valor do S: "+s);:}
-                        | NULL_LITERAL:n{:RESULT = new Expression(new Type("null"), n.toString());Logger.print("Linha 393, valor do N: "+n);:}
-                        ;
-
-logical_expression ::= 
-	NOT expression {: Logger.print("Line 397");:}
-	| expression logical_option expression {: Logger.print("Line 398");:}
-	| expression QUESTION expression COLON expression {: Logger.print("Line 399");:}
-	| BOOLEAN_LITERAL:bl {:Logger.print("400 Ta Chegando em boolean_Literal "+bl); RESULT = new Expression(new Type("boolean"),bl.toString());:}
+		package_declaration_opt 
+		import_declarations_opt
+		type_declarations_opt
+		;
+package_declaration_opt ::= package_declaration | ;
+import_declarations_opt ::= import_declarations | ;
+type_declarations_opt   ::= type_declarations   | ;
+
+import_declarations ::= 
+		import_declaration
+	|	import_declarations import_declaration
+	;
+type_declarations ::= 
+		type_declaration
+	|	type_declarations type_declaration
+	;
+package_declaration ::= 
+		PACKAGE name SEMICOLON
+	;
+import_declaration ::= 
+		single_type_import_declaration
+	|	type_import_on_demand_declaration
+	;
+single_type_import_declaration ::= 
+		IMPORT name SEMICOLON
+	;
+type_import_on_demand_declaration ::=
+		IMPORT name DOT MULT SEMICOLON
+	;
+type_declaration ::=
+		class_declaration
+	|	interface_declaration
+	|	SEMICOLON
+	;
+
+modifiers_opt::=
+	|	modifiers
+	;
+modifiers ::= 	modifier
+	|	modifiers modifier
+	;
+modifier ::=	PUBLIC | PROTECTED | PRIVATE
+	|	STATIC
+	|	ABSTRACT | FINAL | NATIVE | SYNCHRONIZED | TRANSIENT | VOLATILE | THREADSAFE
+	;
+
+class_declaration ::= 
+	modifiers_opt CLASS IDENTIFIER super_opt interfaces_opt class_body
+	;
+super_cl ::=	EXTENDS class_type
+	;
+super_opt ::=	
+	|	super_cl
+	;
+interfaces ::=	IMPLEMENTS interface_type_list
+	;
+interfaces_opt::=
+	|	interfaces 
+	;
+interface_type_list ::= 
+		interface_type
+	|	interface_type_list COMMA interface_type
+	;
+class_body ::=	LBRACE class_body_declarations_opt RBRACE 
+	;
+class_body_declarations_opt ::= 
+	|	class_body_declarations ;
+class_body_declarations ::= 
+		class_body_declaration
+	|	class_body_declarations class_body_declaration
+	;
+class_body_declaration ::=
+		class_member_declaration
+	|	static_initializer
+	|	constructor_declaration
+	|	block
+	;
+class_member_declaration ::=
+		field_declaration
+	|	method_declaration
+	/* repeat the prod for 'class_declaration' here: */
+	|	modifiers_opt CLASS IDENTIFIER super_opt interfaces_opt class_body
+	|	interface_declaration
+  | SEMICOLON
+	;
+
+field_declaration ::= 
+		modifiers_opt type variable_declarators SEMICOLON
+	;
+variable_declarators ::=
+		variable_declarator
+	|	variable_declarators COMMA variable_declarator
+	;
+variable_declarator ::=
+		variable_declarator_id
+	|	variable_declarator_id EQ variable_initializer
+	;
+variable_declarator_id ::=
+		IDENTIFIER
+	|	variable_declarator_id LBRACK RBRACK
+	;
+variable_initializer ::=
+		expression
+	|	array_initializer
+	;
+
+method_declaration ::=
+		method_header method_body
+	;
+method_header ::=
+		modifiers_opt type method_declarator throws_opt
+	|	modifiers_opt VOID method_declarator throws_opt
+	;
+method_declarator ::=
+		IDENTIFIER LPAREN formal_parameter_list_opt RPAREN
+	|	method_declarator LBRACK RBRACK // deprecated
+	// be careful; the above production also allows 'void foo() []'
+	;
+formal_parameter_list_opt ::=
+	|	formal_parameter_list
+	;
+formal_parameter_list ::=
+		formal_parameter
+	|	formal_parameter_list COMMA formal_parameter
+	;
+formal_parameter ::=
+		type variable_declarator_id
+	|	FINAL type variable_declarator_id
+	;
+throws_opt ::=	
+	|	throws
+	;
+throws ::=	THROWS class_type_list
+	;
+class_type_list ::=
+		class_type
+	|	class_type_list COMMA class_type
+	;
+method_body ::=	block
+	|	SEMICOLON
+	;
+
+static_initializer ::=
+		STATIC block
+	;
+
+constructor_declaration ::=
+		modifiers_opt constructor_declarator throws_opt 
+			constructor_body
+	;
+constructor_declarator ::=
+		simple_name LPAREN formal_parameter_list_opt RPAREN
+	;
+constructor_body ::=
+		LBRACE explicit_constructor_invocation
+			block_statements RBRACE
+	|	LBRACE explicit_constructor_invocation RBRACE
+	|	LBRACE block_statements RBRACE
+	|	LBRACE RBRACE
+	;
+explicit_constructor_invocation ::=
+		THIS LPAREN argument_list_opt RPAREN SEMICOLON
+	|	SUPER LPAREN argument_list_opt RPAREN SEMICOLON
+	|	primary DOT THIS LPAREN argument_list_opt RPAREN SEMICOLON
+	|	primary DOT SUPER LPAREN argument_list_opt RPAREN SEMICOLON
+	;
+
+interface_declaration ::=
+		modifiers_opt INTERFACE IDENTIFIER extends_interfaces_opt 
+			interface_body
+	;
+extends_interfaces_opt ::=
+	|	extends_interfaces
+	;
+extends_interfaces ::=
+		EXTENDS interface_type
+	|	extends_interfaces COMMA interface_type
+	;
+interface_body ::=
+		LBRACE interface_member_declarations_opt RBRACE
+	;
+interface_member_declarations_opt ::=
+	|	interface_member_declarations
+	;
+interface_member_declarations ::=
+		interface_member_declaration
+	|	interface_member_declarations interface_member_declaration
+	;
+interface_member_declaration ::=
+		constant_declaration
+	|	abstract_method_declaration
+	|	class_declaration
+	|	interface_declaration
+  | SEMICOLON
+	;
+constant_declaration ::=
+		field_declaration
+	;
+abstract_method_declaration ::=
+		method_header SEMICOLON
+	;
+
+array_initializer ::=
+		LBRACE variable_initializers COMMA RBRACE
+	|	LBRACE variable_initializers RBRACE
+	|	LBRACE COMMA RBRACE
+	|	LBRACE RBRACE
+	;
+variable_initializers ::=
+		variable_initializer
+	|	variable_initializers COMMA variable_initializer
+	;
+
+block ::=	LBRACE block_statements_opt RBRACE
+	;
+block_statements_opt ::=
+	|	block_statements
+	;
+block_statements ::=
+		block_statement
+	|	block_statements block_statement
+	;
+block_statement ::=
+		local_variable_declaration_statement
+	|	statement
+	|	class_declaration
+	|	interface_declaration
+	;
+local_variable_declaration_statement ::=
+		local_variable_declaration SEMICOLON
+	;
+local_variable_declaration ::=
+		type variable_declarators
+	|	FINAL type variable_declarators
+	;
+statement ::=	statement_without_trailing_substatement
+	|	labeled_statement
+	|	if_then_statement
+	|	if_then_else_statement
+	|	while_statement
+	|	for_statement
+	;
+statement_no_short_if ::=
+		statement_without_trailing_substatement
+	|	labeled_statement_no_short_if
+	|	if_then_else_statement_no_short_if
+	|	while_statement_no_short_if
+	|	for_statement_no_short_if
+	;
+statement_without_trailing_substatement ::=
+		block
+	|	empty_statement
+	|	expression_statement
+	|	switch_statement
+	|	do_statement
+	|	break_statement
+	|	continue_statement
+	|	return_statement
+	|	synchronized_statement
+	|	throw_statement
+	|	try_statement
+	;
+empty_statement ::=
+		SEMICOLON
+	;
+labeled_statement ::=
+		IDENTIFIER COLON statement
+	;
+labeled_statement_no_short_if ::=
+		IDENTIFIER COLON statement_no_short_if
+	;
+expression_statement ::=
+		statement_expression SEMICOLON
+	;
+statement_expression ::=
+		assignment
+	|	preincrement_expression
+	|	predecrement_expression
+	|	postincrement_expression
+	|	postdecrement_expression
+	|	method_invocation
+	|	class_instance_creation_expression
+	;
+if_then_statement ::=
+		IF LPAREN expression RPAREN statement
+	;
+if_then_else_statement ::=
+		IF LPAREN expression RPAREN statement_no_short_if 
+			ELSE statement
+	;
+if_then_else_statement_no_short_if ::=
+		IF LPAREN expression RPAREN statement_no_short_if
+			ELSE statement_no_short_if
+	;
+switch_statement ::=
+		SWITCH LPAREN expression RPAREN switch_block
+	;
+switch_block ::=
+		LBRACE switch_block_statement_groups switch_labels RBRACE
+	|	LBRACE switch_block_statement_groups RBRACE
+	|	LBRACE switch_labels RBRACE
+	|	LBRACE RBRACE
+	;
+switch_block_statement_groups ::=
+		switch_block_statement_group
+	|	switch_block_statement_groups switch_block_statement_group
+	;
+switch_block_statement_group ::=
+		switch_labels block_statements
+	;
+switch_labels ::=
+		switch_label
+	|	switch_labels switch_label
+	;
+switch_label ::=
+		CASE constant_expression COLON
+	|	DEFAULT COLON
+	;
+
+while_statement ::=
+		WHILE LPAREN expression RPAREN statement
+	;
+while_statement_no_short_if ::=
+		WHILE LPAREN expression RPAREN statement_no_short_if
+	;
+do_statement ::=
+		DO statement WHILE LPAREN expression RPAREN SEMICOLON
+	;
+for_statement ::=
+		FOR LPAREN for_init_opt SEMICOLON expression_opt SEMICOLON
+			for_update_opt RPAREN statement
+	;
+for_statement_no_short_if ::=
+		FOR LPAREN for_init_opt SEMICOLON expression_opt SEMICOLON
+			for_update_opt RPAREN statement_no_short_if
+	;
+for_init_opt ::=
+	|	for_init
+	;
+for_init ::=	statement_expression_list
+	|	local_variable_declaration
+	;
+for_update_opt ::=
+	|	for_update
+	;
+for_update ::=	statement_expression_list
+	;
+statement_expression_list ::=
+		statement_expression
+	|	statement_expression_list COMMA statement_expression
 	;
 
 identifier_opt ::= 
-	{: Logger.print("Line 401");:}
-	| IDENTIFIER {: Logger.print("Line 402");:};
+	|	IDENTIFIER
+	;
 
-expression_end_option ::=
-    LPAREN arglist_opt RPAREN {: Logger.print("Line 408");:}
-    | LBRACK expression RBRACK {: Logger.print("Line 409");:}
-    | DOT expression {: Logger.print("Line 410");:}
-    | COMMA expression {: Logger.print("Line 411");:}
-    | INSTANCEOF entity_name {: Logger.print("Line 412");:};
+break_statement ::=
+		BREAK identifier_opt SEMICOLON
+	;
 
-arglist_opt ::= 
-	expression_loop {: Logger.print("Line 415");:};
+continue_statement ::=
+		CONTINUE identifier_opt SEMICOLON
+	;
+return_statement ::=
+		RETURN expression_opt SEMICOLON
+	;
+throw_statement ::=
+		THROW expression SEMICOLON
+	;
+synchronized_statement ::=
+		SYNCHRONIZED LPAREN expression RPAREN block
+	;
+try_statement ::=
+		TRY block catches
+	|	TRY block catches_opt finally
+	;
+catches_opt ::=
+	|	catches
+	;
+catches ::=	catch_clause
+	|	catches catch_clause
+	;
+catch_clause ::=
+		CATCH LPAREN formal_parameter RPAREN block
+	;
+finally ::=	FINALLY block
+	;
 
-expression_loop ::= 
-	  expression {: Logger.print("Line 418");:}
-	| expression COMMA expression_loop {: Logger.print("Line 419");:};
+// 19.12) Expressions
+primary ::=	primary_no_new_array
+	|	array_creation_expression
+	;
+primary_no_new_array ::=
+		literal
+	|	THIS
+	|	LPAREN expression RPAREN
+	|	class_instance_creation_expression
+	|	field_access
+	|	method_invocation
+	|	array_access
+	|	primitive_type DOT CLASS
+	|	VOID DOT CLASS
+	|	array_type DOT CLASS
+	|	name DOT CLASS
+	|	name DOT THIS
+	;
+class_instance_creation_expression ::=
+		NEW class_type LPAREN argument_list_opt RPAREN
+	|	NEW class_type LPAREN argument_list_opt RPAREN class_body
+	|	primary DOT NEW IDENTIFIER
+			LPAREN argument_list_opt RPAREN
+	|	primary DOT NEW IDENTIFIER
+			LPAREN argument_list_opt RPAREN class_body
+	;
+argument_list_opt ::=
+	|	argument_list
+	;
+argument_list ::=
+		expression
+	|	argument_list COMMA expression
+	;
+array_creation_expression ::=
+		NEW primitive_type dim_exprs dims_opt
+	|	NEW class_or_interface_type dim_exprs dims_opt
+	|	NEW primitive_type dims array_initializer
+	|	NEW class_or_interface_type dims array_initializer
+	;
+dim_exprs ::=	dim_expr
+	|	dim_exprs dim_expr
+	;
+dim_expr ::=	LBRACK expression RBRACK
+	;
+dims_opt ::=
+	|	dims
+	;
+dims ::=	LBRACK RBRACK
+	|	dims LBRACK RBRACK
+	;
+field_access ::=
+		primary DOT IDENTIFIER
+	|	SUPER DOT IDENTIFIER
+	|	name DOT SUPER DOT IDENTIFIER
+	;
+method_invocation ::=
+		name LPAREN argument_list_opt RPAREN
+	|	primary DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+	|	SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+	|	name DOT SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+	;
+array_access ::=
+		name LBRACK expression RBRACK
+	|	primary_no_new_array LBRACK expression RBRACK
+	;
+postfix_expression ::=
+		primary
+	|	name
+	|	postincrement_expression
+	|	postdecrement_expression
+	;
+postincrement_expression ::=
+		postfix_expression PLUSPLUS
+	;
+postdecrement_expression ::=
+		postfix_expression MINUSMINUS
+	;
+unary_expression ::=
+		preincrement_expression
+	|	predecrement_expression
+	|	PLUS unary_expression
+	|	MINUS unary_expression
+	|	unary_expression_not_plus_minus
+	;
+preincrement_expression ::=
+		PLUSPLUS unary_expression
+	;
+predecrement_expression ::=
+		MINUSMINUS unary_expression
+	;
+unary_expression_not_plus_minus ::=
+		postfix_expression
+	|	COMP unary_expression
+	|	NOT unary_expression
+	|	cast_expression
+	;
+cast_expression ::=
+		LPAREN primitive_type dims_opt RPAREN unary_expression
+	|	LPAREN expression RPAREN unary_expression_not_plus_minus
+	|	LPAREN name dims RPAREN unary_expression_not_plus_minus
+	;
+multiplicative_expression ::=
+		unary_expression
+	|	multiplicative_expression MULT unary_expression
+	|	multiplicative_expression DIV unary_expression
+	|	multiplicative_expression MOD unary_expression
+	;
+additive_expression ::=
+		multiplicative_expression
+	|	additive_expression PLUS multiplicative_expression
+	|	additive_expression MINUS multiplicative_expression
+	;
+shift_expression ::=
+		additive_expression
+	|	shift_expression LSHIFT additive_expression
+	|	shift_expression RSHIFT additive_expression
+	|	shift_expression URSHIFT additive_expression
+	;
+relational_expression ::=
+		shift_expression
+	|	relational_expression LT shift_expression
+	|	relational_expression GT shift_expression
+	|	relational_expression LTEQ shift_expression
+	|	relational_expression GTEQ shift_expression
+	|	relational_expression INSTANCEOF reference_type
+	;
+equality_expression ::=
+		relational_expression
+	|	equality_expression EQEQ relational_expression
+	|	equality_expression NOTEQ relational_expression
+	;
+and_expression ::=
+		equality_expression
+	|	and_expression AND equality_expression
+	;
+exclusive_or_expression ::=
+		and_expression
+	|	exclusive_or_expression XOR and_expression
+	;
+inclusive_or_expression ::=
+		exclusive_or_expression
+	|	inclusive_or_expression OR exclusive_or_expression
+	;
+conditional_and_expression ::=
+		inclusive_or_expression
+	|	conditional_and_expression ANDAND inclusive_or_expression
+	;
+conditional_or_expression ::=
+		conditional_and_expression
+	|	conditional_or_expression OROR conditional_and_expression
+	;
+conditional_expression ::=
+		conditional_or_expression
+	|	conditional_or_expression QUESTION expression 
+			COLON conditional_expression
+	;
+assignment_expression ::=
+		conditional_expression
+	|	assignment
+	;
+assignment ::=	left_hand_side:ls assignment_operator:o assignment_expression:e {:Logger.print("Line 753");SemanticImpl.getInstance().checkTypeOfAssignment((Variable) ls,(Expression) e);:}
+	;
+left_hand_side ::=
+		name
+	|	field_access
+	|	array_access
+	;
+assignment_operator ::=
+		EQ
+	|	MULTEQ
+	|	DIVEQ
+	|	MODEQ
+	|	PLUSEQ
+	|	MINUSEQ
+	|	LSHIFTEQ
+	|	RSHIFTEQ
+	|	URSHIFTEQ
+	|	ANDEQ
+	|	XOREQ
+	|	OREQ
+	;
+expression_opt ::=
+	|	expression
+	;
+expression ::=	assignment_expression
+	;
+constant_expression ::=
+		expression
+	;
