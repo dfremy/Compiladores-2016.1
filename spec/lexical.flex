@@ -66,14 +66,6 @@ Float2    = \. [0-9]+
 Float3    = [0-9]+
 Exponent = [eE] [+-]? [0-9]+
 
-/* Strings */
-Marker = [\"]
-Other_Symbols = \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)
-Separators = \r|\n|\r\n\t\f
-Alphanumerics_ = [ a-zA-Z0-9_]
-
-temp = [ \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)|\"|\r|\n|\r\n\t\f a-zA-Z0-9_]*
-
 /* String and Character literals */
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]

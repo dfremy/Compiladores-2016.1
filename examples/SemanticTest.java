@@ -1,15 +1,16 @@
 public class SemanticTest{
 	
-	int a = 10;
-	int b;
+	int globalA = 10;
+	int globalB;
 	
 	public int testOverload(){
 		int a = 5;
-		return 5;
+		int b;
+		return a;
 	}
 	
 	public int testOverload(int a){
-		return 5;
+		return 10;
 	}
 	
 	public void testTypeCreated(){
@@ -22,15 +23,19 @@ public class SemanticTest{
 	}
 	
 	public void testDeclaration(){
-		a = 10;
+		globalA = 10;
 	}
 	
 	public void testNumericExpression() {
 		int a = 5 + 5;
-		int e = (3*(1 + true));
 		int b = 5 * 10;
 		int c = 10 / 2;
 		int d = 3 - 3;
+		int e = (3*(1 + 2));
+		e /= 2;
+		float f = 2.5;
+		f += 2.5;
+		f += 2;
 	}
 	
 	public void testLogical(){
@@ -40,6 +45,10 @@ public class SemanticTest{
 		boolean d = !a;
 		boolean e = !(b && c);
 		boolean f = e;
+		f &= true;
+		f |= a;
+		d ^= a || b;
+		f = a ^ b;
 	}
 	
 	public void testSwitch(){

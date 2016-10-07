@@ -56,6 +56,31 @@ public class CodeGenerator {
 		addCode(labels + ": AND " + result + ", " + r1 + ", " + r2);
 	}
 
+	public void generateANDEQCode(Register r1, Expression e) {
+		generateANDCode(r1, e.getRegister());
+		generateSTCode(r1, e);
+	}
+
+	public void generateOREQCode(Register r1, Expression e) {
+		generateORCode(r1, e.getRegister());
+		generateSTCode(r1, e);
+	}
+
+	public void generateXOREQCode(Expression e1, Expression e2) {
+		generateXORCode(e2.getRegister(), e2.getRegister());
+		generateSTCode(e1);
+	}
+
+	public void generateDIVEQCode(Register r1, Expression e) {
+		generateDIVCode(r1, e.getRegister());
+		generateSTCode(r1, e);
+	}
+
+	public void generateMODEQCode(Register r1, Expression e) {
+		generateMODCode(r1, e.getRegister());
+		generateSTCode(r1, e);
+	}
+
 	public void generateORCode(Register r1, Register r2) {
 		labels += 8;
 
@@ -155,6 +180,14 @@ public class CodeGenerator {
 		Register result = allocateRegister();
 		addCode(labels + ": MUL " + result + ", " + r1 + ", " + r2);
 	}
+
+	public void generateMODCode(Register r1, Register r2) {
+		labels += 8;
+
+		register++;
+		Register result = allocateRegister();
+		addCode(labels + ": MOD " + result + ", " + r1 + ", " + r2);
+	}
 	
 	public void generateDIVCode(Register r1, Register r2) {
 		labels += 8;
@@ -194,10 +227,14 @@ public class CodeGenerator {
 	}
 	
 	public void generateBNEQZCodeCase() {
+		Expression e = new Expression("int");
+		e.setAssemblyValue("0");
+		generateLDCode(e);
 		labels += 8;
 
-		Register current = allocateRegister();
-		addCode(labels + ": BNEQZ " + current + ", #caseEnd");
+		Register one = registers[register - 1];
+		Register two = allocateRegister();
+		addCode(labels + ": BNE " + one + ", " + two + ", #caseEnd");
 	}
 	
 	public void generateBGEQZCode(int br) {

@@ -77,7 +77,7 @@ non terminal numeric_option,  middle_operator;
 non terminal testing_option, logical_option, string_operation, bit_operation;
 non terminal arglist_opt;
 non terminal creating_expression_option, creating_expression_end_option;
-non terminal attribution;
+non terminal attribution, eq_operator;
 
 start with compilation_unit;
 
@@ -307,7 +307,7 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
               | LPAREN expression:e1 RPAREN {: Logger.print("LINE 270");RESULT=e1;:}
               | expression:e2 expression_end_option {: Logger.print("LINE 271");RESULT=e2;:};
 
-attribution ::= IDENTIFIER:id EQ expression:e    {: Logger.print("Line 273 " + e);
+attribution ::= IDENTIFIER:id eq_operator:op expression:e    {: Logger.print("Line 273 " + e);
 	                                                if(e instanceof String){
 	                                                    SemanticImpl.getInstance().checkVariableAttribution(id, (String) e);
 	                                                    Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
@@ -315,10 +315,21 @@ attribution ::= IDENTIFIER:id EQ expression:e    {: Logger.print("Line 273 " + e
 	                                                }else{
 	                                                    SemanticImpl.getInstance().checkVariableAttribution(id, (Expression) e);
 	                                                    Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
-	                                                    var.setValue((Expression) e);
-    												    SemanticImpl.getInstance().getCodeGenerator().assignmentDeclaration((Variable)var,(Expression)e);
+	                                                    ((Expression) e).setAssemblyValue((String) id); var.setValue((Expression) e);
+    												    SemanticImpl.getInstance().generateBaseOpCode((String) op, ((Variable)var).getValue(),(Expression)e);
 	                                                    RESULT = e;
 	                                                }:};
+	                                                
+eq_operator ::= 
+				PLUSEQ:op {: Logger.print("Line 524 " + op); RESULT = "+="; :}
+				| MINUSEQ:op {: Logger.print("Line 525 " + op); RESULT = "-="; :}
+				| MULTEQ:op {: Logger.print("Line 526 " + op); RESULT = "*="; :}
+				| DIVEQ:op {: Logger.print("Line 527 " + op); RESULT = "/="; :}
+				| MODEQ:op {: Logger.print("Line 528 " + op); RESULT = "%="; :}
+				| ANDEQ:op {: Logger.print("Line 324 " + op); RESULT = "&=";:}
+				| OREQ:op {: Logger.print("Line 327 " + op); RESULT = "|=";:}
+				| XOREQ:op {: Logger.print("Line 329 " + op); RESULT = "^=";:}
+				| EQ:op {: Logger.print("Line 529 " + op); RESULT = "+="; :};
 
 numeric_option ::= PLUSPLUS:op {: Logger.print("Line 275"); RESULT = op;:}
                    | MINUSMINUS {: Logger.print("Line 276");:};
@@ -330,16 +341,11 @@ for_statement ::=
 	| FOR LPAREN for_div_1 expression_opt SEMICOLON expression_opt RPAREN statement_block {: Logger.print("Line 278");:};
 	
 middle_operator ::= 
-	PLUS {: Logger.print("Line 282"); RESULT = "+";:}
-	| PLUSEQ {: Logger.print("Line 283");RESULT = "+=";:}
+	PLUS {: Logger.print("Line 283");RESULT = "+";:}
 	| MINUS {: Logger.print("Line 284");RESULT = "-";:}
-	| MINUSEQ {: Logger.print("Line 285");RESULT = "-=";:}
 	| MULT {: Logger.print("Line 286");RESULT = "*";:}
-	| MULTEQ {: Logger.print("Line 287");RESULT = "*=";:}
 	| DIV {: Logger.print("Line 288");RESULT = "/";:}
-	| DIVEQ {: Logger.print("Line 289");RESULT = "/=";:}
-	| MOD {: Logger.print("Line 290");RESULT = "%";:}
-	| MODEQ {: Logger.print("Line 291");RESULT = "%=";:};
+	| MOD {: Logger.print("Line 290");RESULT = "%";:};
 
 for_div_1 ::= 
 	variable_declaration:vd {: Logger.print(" Line 294");RESULT=vd;:}
@@ -375,16 +381,11 @@ try_statement ::=
 
 logical_option ::=  
 	  AND {: Logger.print("Line 323"); RESULT = "&";:}
-	| ANDEQ {: Logger.print("Line 324");RESULT = "&=";:}
 	| OR {: Logger.print("Line 325");RESULT = "|";:}
 	| OROR {: Logger.print("Line 326");RESULT = "||";:}
-	| OREQ {: Logger.print("Line 327");RESULT = "|=";:}
 	| XOR {: Logger.print("Line 328");RESULT = "^";:}
-	| XOREQ {: Logger.print("Line 329");RESULT = "^=";:}
 	| ANDAND {: Logger.print("Line 330");RESULT = "&&";:}
-	| OROREQ {: Logger.print("Line 331");RESULT = "||=";:}
-	| MOD {: Logger.print("Line 332");RESULT = "%";:}
-	| MODEQ {: Logger.print("Line 333");RESULT = "%=";:};
+	| MOD {: Logger.print("Line 332");RESULT = "%";:};
 
 
 catch_loop ::= 

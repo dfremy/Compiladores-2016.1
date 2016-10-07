@@ -59,6 +59,10 @@ public class Expression {
 		return "Expression of type; " + getType();
 	}
 
+	public void setAssemblyValue(String value) {
+		this.value = value;
+	}
+
 	public String getAssemblyValue() {
 		return this.value;
 	}

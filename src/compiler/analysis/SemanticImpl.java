@@ -383,6 +383,7 @@ public class SemanticImpl {
 	}
 
 	private boolean hasReturn(Expression exp) throws InvalidFunctionException {
+		if(exp.getContext() == null) return false;
 		return exp.getContext().equalsIgnoreCase("return");
 	}
 
@@ -598,6 +599,15 @@ public class SemanticImpl {
 		case XOR_OP:
 			codeGenerator.generateXORCode(e1.getRegister(), e2.getRegister());
 			break;
+		case ANDEQ_OP:
+			codeGenerator.generateANDEQCode(e1.getRegister(), e2);
+			break;
+		case OREQ_OP:
+			codeGenerator.generateOREQCode(e1.getRegister(), e2);
+			break;
+		case XOREQ_OP:
+			codeGenerator.generateXOREQCode(e1, e2);
+			break;
 		case MINUS:
 			codeGenerator.generateSUBCode(e1.getRegister(), e2.getRegister());
 			break;
@@ -609,6 +619,24 @@ public class SemanticImpl {
 			break;
 		case DIV:
 			codeGenerator.generateDIVCode(e1.getRegister(), e2.getRegister());
+			break;
+		case MOD:
+			codeGenerator.generateMODCode(e1.getRegister(), e2.getRegister());
+			break;
+		case MINUSEQ:
+			codeGenerator.generateSUBCode(e1.getRegister(), e2.getRegister());
+			break;
+		case MULTEQ:
+			codeGenerator.generateMULCode(e1.getRegister(), e2.getRegister());
+			break;
+		case PLUSEQ:
+			codeGenerator.generateADDCode(e1.getRegister(), e2.getRegister());
+			break;
+		case DIVEQ:
+			codeGenerator.generateDIVEQCode(e1.getRegister(), e2);
+			break;
+		case MODEQ:
+			codeGenerator.generateMODEQCode(e1.getRegister(), e2);
 			break;
 		default:
 			break;
@@ -626,14 +654,14 @@ public class SemanticImpl {
 			return Operation.MULT;
 		case "/":
 			return Operation.DIV;
-		case "<":
-			return Operation.LESS_THAN;
-		case ">":
-			return Operation.MORE_THAN;
-		case "<=":
-			return Operation.LE_OP;
-		case ">=":
-			return Operation.GE_OP;
+		case "+=":
+			return Operation.PLUSEQ;
+		case "-=":
+			return Operation.MINUSEQ;
+		case "*=":
+			return Operation.MULTEQ;
+		case "/=":
+			return Operation.DIVEQ;
 		case "==":
 			return Operation.EQ_OP;
 		case "!=":
@@ -644,6 +672,12 @@ public class SemanticImpl {
 			return Operation.OR_OP;
 		case "^":
 			return Operation.XOR_OP;
+		case "^=":
+			return Operation.XOREQ_OP;
+		case "|=":
+			return Operation.OREQ_OP;
+		case "&=":
+			return Operation.ANDEQ_OP;
 		default:
 			return Operation.PLUS;
 		}
