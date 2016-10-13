@@ -54,4 +54,7 @@ public class SemanticTest{
 				break;
 		}
 	}
+	
+	public void test(){
+	}
 }
