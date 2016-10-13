@@ -1,12 +1,6 @@
 package examples;
 
-import compiler.main.Main;
-
-import java.io.FileReader;
-import java.io.Serializable;
-
-
-public class Test extends Main implements Serializable {
+public class Test {
 
 	public void begginTest(){
 		boolean a = true;

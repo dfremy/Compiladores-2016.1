@@ -1,4 +1,4 @@
-package tests;
+package main;
 
 import compiler.generated.Parser;
 import compiler.generated.Scanner;
@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class ParserTest {
+public class MainTest {
 	
 	public static void main(String[] args) throws IOException {
 		String filePath = "examples/SemanticTest.java";
@@ -25,11 +25,8 @@ public class ParserTest {
 			s = parser.parse();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-			return;
 		}
 		
-		System.out.println("Done!");
-		System.out.println(s);
+		System.out.println("The compilation process was successfully finished!");
 	}
-
 }

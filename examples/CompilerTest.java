@@ -1,7 +1,6 @@
 
 public class CompilerTest{
 	
-	
 	public void testeAritimetica(){
 		int a = 10 +10 ;
 		float b = 10.0 + 10.0;

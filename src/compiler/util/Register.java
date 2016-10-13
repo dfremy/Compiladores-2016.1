@@ -23,7 +23,5 @@ public enum Register {
 	public String toString(){
 		return value;
 	}
-	
-	
 }
 

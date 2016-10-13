@@ -1,5 +1,4 @@
 package compiler.generated;
-import java_cup.*;
 import java_cup.runtime.*;
 import compiler.core.*;
 
@@ -43,7 +42,7 @@ Identifier = [:jletter:][:jletterdigit:]*
 
 /* White spaces*/
 LineTerminator = \r|\n|\r\n
-WhiteSpace = {LineTerminator} | [ \t\f]
+WhiteSpace     = {LineTerminator} | [ \t\f]
 
 /* Integer literals */
 DecimalLiteral = 0 | [1-9][0-9]*
@@ -64,14 +63,13 @@ DoubleLiteral = ({Float1}|{Float2}|{Float3}) {Exponent}? [dD]
 Float1    = [0-9]+ \. [0-9]*
 Float2    = \. [0-9]+
 Float3    = [0-9]+
-Exponent = [eE] [+-]? [0-9]+
+Exponent  = [eE] [+-]? [0-9]+
 
 /* String and Character literals */
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
 
 %state STRING, CHARLITERAL
-
 
 /* Comments */
 Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
@@ -167,58 +165,52 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
     \'                              { yybegin(CHARLITERAL); }
 
     /* White spaces */
-    {WhiteSpace}				    { /* just ignore it*/}
+    {WhiteSpace}				    { /*just ignore it*/ }
 
     /* Arithmetical operators*/
-    "++"							{return symbol(sym.PLUSPLUS);}
-    "+="							{return symbol(sym.PLUSEQ);}
-    "-="							{return symbol(sym.MINUSEQ);}
-    "*="						    {return symbol(sym.MULTEQ);}
-    "/="				            {return symbol(sym.DIVEQ);}
-    "--"							{return symbol(sym.MINUSMINUS);}
-    "%="							{return symbol(sym.MODEQ);}
-    "<<"							{return symbol(sym.LSHIFT);}
-    ">>>"							{return symbol(sym.URSHIFT);}
-    ">>"              {return symbol(sym.RSHIFT);}
-    "+"               {return symbol(sym.PLUS);}
-    "-"                 {return symbol(sym.MINUS);}
-    "*"               {return symbol(sym.MULT);}
-    "/"                 {return symbol(sym.DIV);}
-    "%"                 {return symbol(sym.MOD);}
-
-
+    "++"							{ return symbol(sym.PLUSPLUS); }
+    "+="							{ return symbol(sym.PLUSEQ); }
+    "-="							{ return symbol(sym.MINUSEQ); }
+    "*="						    { return symbol(sym.MULTEQ); }
+    "/="				            { return symbol(sym.DIVEQ); }
+    "--"							{ return symbol(sym.MINUSMINUS); }
+    "%="							{ return symbol(sym.MODEQ); }
+    "<<"							{ return symbol(sym.LSHIFT); }
+    ">>>"							{ return symbol(sym.URSHIFT); }
+    ">>"							{ return symbol(sym.RSHIFT); }
+    "+"								{ return symbol(sym.PLUS); }
+    "-"								{ return symbol(sym.MINUS); }
+    "*"								{ return symbol(sym.MULT); }
+    "/"								{ return symbol(sym.DIV); }
+    "%"								{ return symbol(sym.MOD); }
     
     /* Operators */
-    ":"                             {return symbol(sym.COLON);}
-    "~"                             {return symbol(sym.COMP); }
-
+    ":"                             { return symbol(sym.COLON); }
+    "~"                             { return symbol(sym.COMP); }
+     
     /* Logical Operators*/
-    "=="							{return symbol(sym.EQEQ);}
-    ">="							{return symbol(sym.GTEQ);}
-    "<="							{return symbol(sym.LTEQ);}
-    "<"							    {return symbol(sym.LT);}
-    ">"							    {return symbol(sym.GT);}
-    "||="							{return symbol(sym.OROREQ);}
-    "||"                           {return symbol(sym.OROR);}
-    "&&"							{return symbol(sym.ANDAND);}
-    "!="							{return symbol(sym.NOTEQ);}
-    "&="							{return symbol(sym.ANDEQ);}
-    "|="							{return symbol(sym.OREQ);}
-    "^="                            {return symbol(sym.XOREQ);}
-    ">>="							{return symbol(sym.RSHIFTEQ);}
-    "<<="							{return symbol(sym.LSHIFTEQ);}
-    "?"               { return symbol(sym.QUESTION); }
-    "!"                 {return symbol(sym.NOT);}
-    "|"                 {return symbol(sym.OR);}
-    "&"                 {return symbol(sym.AND);}
-    "^"                   {return symbol(sym.XOR);}
-
-
+    "=="							{ return symbol(sym.EQEQ); }
+    ">="							{ return symbol(sym.GTEQ); }
+    "<="							{ return symbol(sym.LTEQ); }
+    "<"							    { return symbol(sym.LT); }
+    ">"							    { return symbol(sym.GT); }
+    "||="							{ return symbol(sym.OROREQ); }
+    "||"							{ return symbol(sym.OROR); }
+    "&&"							{ return symbol(sym.ANDAND); }
+    "!="							{ return symbol(sym.NOTEQ); }
+    "&="							{ return symbol(sym.ANDEQ); }
+    "|="							{ return symbol(sym.OREQ); }
+    "^="                            { return symbol(sym.XOREQ); }
+    ">>="							{ return symbol(sym.RSHIFTEQ); }
+    "<<="							{ return symbol(sym.LSHIFTEQ); }
+    "?"								{ return symbol(sym.QUESTION); }
+    "!"								{ return symbol(sym.NOT); }
+    "|"								{ return symbol(sym.OR); }
+    "&"								{ return symbol(sym.AND); }
+    "^"								{ return symbol(sym.XOR); }
 
     /* Assignment */
-    "="                 {return symbol(sym.EQ);}
-
-
+    "="								{ return symbol(sym.EQ); }
 }
 
  <STRING> {
@@ -239,8 +231,8 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
                                         string.append( val ); }
 
   /* Error cases */
-  \\.                               { throw new RuntimeException("Illegal escape sequence \""+yytext()+"\""); }
-  {LineTerminator}                  { throw new RuntimeException("Unterminated string at end of line"); }
+  \\.                               { throw new RuntimeException("ERROR: Illegal escape sequence \""+yytext()+"\""); }
+  {LineTerminator}                  { throw new RuntimeException("ERROR: Unterminated string at end of line"); }
 
 }
 
@@ -261,7 +253,6 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
 										return symbol(sym.CHARACTER_LITERAL, new Character((char)val)); }
 
   /* Error cases */
-  \\.                               { throw new RuntimeException("Illegal escape sequence \""+yytext()+"\""); }
-  {LineTerminator}                  { throw new RuntimeException("Unterminated character literal at end of line"); }
-
+  \\.                               { throw new RuntimeException("ERROR: Illegal escape sequence \""+yytext()+"\""); }
+  {LineTerminator}                  { throw new RuntimeException("ERROR: Unterminated character literal at end of line"); }
 }

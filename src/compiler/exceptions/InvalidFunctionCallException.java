@@ -1,4 +1,4 @@
-package compiler.exception;
+package compiler.exceptions;
 
 public class InvalidFunctionCallException extends Exception {
 

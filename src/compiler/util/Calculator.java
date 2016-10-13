@@ -34,7 +34,6 @@ public class Calculator {
 			throw new InvalidOperationException(
 					"Types are not avaible to this kind of operation");
 		}
-
 	}
 
 	public String getSubNumericValue(Expression le, Expression re, String md)

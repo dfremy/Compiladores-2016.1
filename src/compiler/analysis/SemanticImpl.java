@@ -1,27 +1,9 @@
 package compiler.analysis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
-import compiler.core.Expression;
-import compiler.core.Function;
-import compiler.core.Operation;
-import compiler.core.Parameter;
-import compiler.core.Program;
-import compiler.core.ScopedEntity;
-import compiler.core.Type;
-import compiler.core.Variable;
-import compiler.exception.InvalidFunctionCallException;
-import compiler.exceptions.InvalidFunctionException;
-import compiler.exceptions.InvalidOperationException;
-import compiler.exceptions.InvalidOperatorException;
-import compiler.exceptions.InvalidParameterException;
-import compiler.exceptions.InvalidTypeAssignmentException;
-import compiler.exceptions.InvalidTypeException;
-import compiler.exceptions.InvalidVariableException;
+import compiler.core.*;
+import compiler.exceptions.*;
 import compiler.generator.CodeGenerator;
 import compiler.util.Calculator;
 
@@ -161,7 +143,6 @@ public class SemanticImpl {
 				}
 			}
 		}
-
 	}
 
 	public void exitCurrentScope(Expression exp)
@@ -172,8 +153,6 @@ public class SemanticImpl {
 				checkDeclaredAndReturnedType(scoped.getName(),
 						((Function) scoped).getDeclaredReturnType(), exp);
 			} else {
-				// System.out.println("O declared eh: "+((Function)
-				// scoped).getDeclaredReturnType());
 				if (!((Function) scoped).getDeclaredReturnType().equals(
 						new Type("void"))) {
 					throw new InvalidFunctionException("The function "
@@ -333,9 +312,6 @@ public class SemanticImpl {
 	 * @throws Exception
 	 */
 	private void addVariable(Variable variable) throws Exception {
-		for (String v : variables.keySet()) {
-			// System.out.println(v);
-		}
 		if (scopeStack.isEmpty()) {
 			validateVariableGlobal(variable);
 
@@ -361,8 +337,6 @@ public class SemanticImpl {
 	}
 
 	public void validateFunction(String functionName, ArrayList<Parameter> params, Type declaredType) throws InvalidFunctionException, InvalidParameterException {
-		
-		
 		if (declaredType == null) {
 			throw new InvalidFunctionException(
 					"The function "
@@ -402,9 +376,7 @@ public class SemanticImpl {
 			if(hasReturn(exp)){
 				if(exp.getType() != null){throw new InvalidFunctionException("A void function should not return a: "+exp.getType());} 
 			}
-			
 		}
-		
 	}
 
 	private void checkExistingParameter(ArrayList<Parameter> params)
@@ -423,45 +395,25 @@ public class SemanticImpl {
 
 	public Expression getExpression(Expression le, String md, Expression re)
 			throws InvalidTypeException, InvalidOperationException {
-		// System.out.println("No getexpression " + "tipo 1: "+
-		// le.getType().getName() + "   " + "tipo 2: "+ re.getType().getName());
 		if (checkTypeCompatibility(le.getType(), re.getType())
 				|| checkTypeCompatibility(re.getType(), le.getType())) {
 			Type newType = getMajorType(le.getType(), re.getType());
 			String result;
 			switch (md) {
-
-			case "+":
-				result = calculator.getSumNumericValue(le, re, md);
-				return new Expression(newType, result);
-			case "-":
-				result = calculator.getSubNumericValue(le, re, md);
-				return new Expression(newType, result);
-			case "*":
-				result = calculator.getMultNumericValue(le, re, md);
-				return new Expression(newType, result);
-			case "/":
-				result = calculator.getDivNumericValue(le, re, md);
-				return new Expression(newType, result);
-				// case "+=":
-				// result = calculator.getSumEqNumericValue(le,re,md);
-				// return new Expression(newType,result);
-				// break;
-				// case "-=":
-				// result = calculator.getSubEqNumericValue(le,re,md);
-				// return new Expression(newType,result);
-				// break;
-				// case "%":
-				// result = calculator.getModNumericValue(le,re,md);
-				// return new Expression(newType,result);
-				// break;
-				// case "%=":
-				// result = calculator.getModEqNumericValue(le,re,md);
-				// return new Expression(newType,result);
-				// break;
-				//
-			default:
-				break;
+				case "+":
+					result = calculator.getSumNumericValue(le, re, md);
+					return new Expression(newType, result);
+				case "-":
+					result = calculator.getSubNumericValue(le, re, md);
+					return new Expression(newType, result);
+				case "*":
+					result = calculator.getMultNumericValue(le, re, md);
+					return new Expression(newType, result);
+				case "/":
+					result = calculator.getDivNumericValue(le, re, md);
+					return new Expression(newType, result);
+				default:
+					break;
 			}
 			return new Expression(newType);
 		}
@@ -645,7 +597,6 @@ public class SemanticImpl {
 		default:
 			break;
 		}
-
 	}
 
 	private Operation getOperator(String op) {

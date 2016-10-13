@@ -1,8 +1,6 @@
 package compiler.core;
 
-import compiler.util.Register;
-
-
+import compiler.util.*;
 
 public class Expression {
 	private Type type;
@@ -49,7 +47,7 @@ public class Expression {
 	}
 	
 	public boolean isNumeric() {
-		return    getType().getName().equals("int")
+		return  getType().getName().equals("int")
 				||getType().getName().equals("float")
 				||getType().getName().equals("long")
 				||getType().getName().equals("double");
